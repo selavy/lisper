@@ -22,10 +22,14 @@ add_definitions(-DBOOST_LOG_DYN_LINK)
 find_package(Boost 1.55.0 REQUIRED COMPONENTS log log_setup filesystem thread date_time program_options system)
 include_directories(${Boost_INCLUDE_DIRS})
 
+# cmake
+find_package(CPPUNIT REQUIRED)
+include_directories(${CPPUNIT_INCLUDE_DIRS})
+
 # compiler flags
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --std=c++11")
 
 # add source directories
 add_subdirectory(src)
-#add_subdirectory(tst)
+add_subdirectory(tst)
