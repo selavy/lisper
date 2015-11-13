@@ -13,10 +13,12 @@ public:
     virtual void setUp();
     virtual void tearDown();
 
-    void t_ParseIsSingleDigit();
+    void t_IsSingleDigit();
+    void t_IsNumber();
 
     CPPUNIT_TEST_SUITE(TestParseNumber);
-    CPPUNIT_TEST(t_ParseIsSingleDigit);
+    CPPUNIT_TEST(t_IsSingleDigit);
+    CPPUNIT_TEST(t_IsNumber);
     CPPUNIT_TEST_SUITE_END();
 };
 
