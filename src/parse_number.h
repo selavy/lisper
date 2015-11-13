@@ -7,6 +7,11 @@
 bool is_digit(char c);
 
 // number := <digit> | <digit><number>
+bool is_number(std::string::const_iterator begin, std::string::const_iterator end);
+
 bool is_number(const std::string& num);
+
+// signed_number := <number> | '+'<number> | '-'<number>
+bool is_signed_number(const std::string& num);
 
 #endif // PARSE_NUMBER__H_

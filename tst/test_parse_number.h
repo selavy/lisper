@@ -15,10 +15,12 @@ public:
 
     void t_IsSingleDigit();
     void t_IsNumber();
+    void t_IsSignedNumber();
 
     CPPUNIT_TEST_SUITE(TestParseNumber);
     CPPUNIT_TEST(t_IsSingleDigit);
     CPPUNIT_TEST(t_IsNumber);
+    CPPUNIT_TEST(t_IsSignedNumber);
     CPPUNIT_TEST_SUITE_END();
 };
 
