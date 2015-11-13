@@ -19,8 +19,12 @@ bool is_number(const std::string& num);
 // signed_number := <number> | '+'<number> | '-'<number>
 bool is_signed_number(const std::string& num);
 
+// string -> MaybeNumber
 MaybeNumber parse_digit(char c);
 
-//MaybeNumber parse_number(const std::string& num);
+// (rbegin, rend) -> MaybeNumber
+MaybeNumber parse_number(std::string::const_reverse_iterator rbegin, std::string::const_reverse_iterator rend);
+
+MaybeNumber parse_number(const std::string& num);
 
 #endif // PARSE_NUMBER__H_

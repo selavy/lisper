@@ -50,22 +50,46 @@ void TestParseNumber::t_IsSignedNumber()
 void TestParseNumber::t_ParseDigit()
 {
     typedef std::pair<char, Number> Case;
-    std::vector<Case> cases = { {'1', 1},
-                                {'2', 2},
-                                {'3', 3},
-                                {'4', 4},
-                                {'5', 5},
-                                {'6', 6},
-                                {'7', 7},
-                                {'8', 8},
-                                {'9', 9},
-                                {'0', 0} };
+    std::vector<Case> cases = {
+        {'1', 1},
+        {'2', 2},
+        {'3', 3},
+        {'4', 4},
+        {'5', 5},
+        {'6', 6},
+        {'7', 7},
+        {'8', 8},
+        {'9', 9},
+        {'0', 0}
+    };
     for (const auto& c : cases)
         CPPUNIT_ASSERT(*(parse_digit(c.first)) == c.second);
 
     std::vector<char> bad = {'a', 'b', 'Z', '-', 'T'};
     for (const auto c : bad)
         CPPUNIT_ASSERT(!parse_digit(c));
+}
+
+void TestParseNumber::t_ParseNumber()
+{
+    typedef std::pair<std::string, Number> Case;
+    std::vector<Case> cases = {
+        {"1", 1},
+        {"11", 11},
+        {"12", 12},
+        {"100001", 100001}
+    };
+    for (const auto& c: cases)
+        CPPUNIT_ASSERT(*(parse_number(c.first)) == c.second);
+
+    std::vector<std::string> bad = {
+        "asdf",
+        "1000a",
+        "0b101010",
+        "0xFF"
+    };
+    for (const auto& c: bad)
+        CPPUNIT_ASSERT(!parse_number(c));
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestParseNumber);

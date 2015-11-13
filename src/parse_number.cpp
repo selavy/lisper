@@ -1,6 +1,7 @@
 #include "parse_number.h"
 #include <algorithm>
 #include <stdexcept>
+#include <numeric>
 //------------------------------------------------------------------------------
 bool is_digit(char c)
 {
@@ -30,5 +31,25 @@ MaybeNumber parse_digit(char c)
 {
     if (!is_digit(c)) return MaybeNumber();
     return c - '0';
+}
+//------------------------------------------------------------------------------
+MaybeNumber parse_number(std::string::const_reverse_iterator rbegin, std::string::const_reverse_iterator rend)
+{
+    Number ret = 0;
+    Number multiplier = 1;
+
+    for (; rbegin != rend; ++rbegin) {
+        MaybeNumber digit = parse_digit(*rbegin);
+        if (!digit) return MaybeNumber();
+        ret += *digit * multiplier;
+        multiplier *= 10;
+    }
+    
+    return ret;
+}
+//------------------------------------------------------------------------------
+MaybeNumber parse_number(const std::string& num)
+{
+    return parse_number(num.crbegin(), num.crend());
 }
 //------------------------------------------------------------------------------
