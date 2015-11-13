@@ -1,7 +1,5 @@
 #include <iostream>
 #include <fstream>
-// #include <cppunit/TestCase.h>
-// #include <cppunit/TestFixture.h>
 #include <cppunit/ui/text/TextTestRunner.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/extensions/TestFactoryRegistry.h>
@@ -12,6 +10,8 @@
 #include <cppunit/CompilerOutputter.h>
 #include <cppunit/XmlOutputter.h>
 
+// tests
+#include "test_parse_number.h"
 
 int main(int argc, char** argv)
 {

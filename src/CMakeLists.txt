@@ -2,6 +2,7 @@
 
 add_executable(
   lisper
+  parse_number.cpp
   main.cpp
   )
 

@@ -1,7 +1,11 @@
 # tst/
 
+include_directories("${CMAKE_SOURCE_DIR}/src")
+
 add_executable(
   unittest
+  ../src/parse_number.cpp
+  test_parse_number.cpp
   unittest.cpp
   )
 
