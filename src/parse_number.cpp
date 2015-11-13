@@ -1,5 +1,6 @@
 #include "parse_number.h"
 #include <algorithm>
+#include <stdexcept>
 //------------------------------------------------------------------------------
 bool is_digit(char c)
 {
@@ -23,5 +24,11 @@ bool is_signed_number(const std::string& num)
         return is_number(std::begin(num) + 1, std::end(num));
     }
     return false;
+}
+//------------------------------------------------------------------------------
+Number parse_digit(char c)
+{
+    if (!is_digit(c)) throw std::runtime_error("Not a digit!");
+    return c - '0';
 }
 //------------------------------------------------------------------------------

@@ -2,6 +2,7 @@
 #include "parse_number.h"
 #include <vector>
 #include <string>
+#include <utility>
 
 TestParseNumber::TestParseNumber()
 {
@@ -43,6 +44,23 @@ void TestParseNumber::t_IsSignedNumber()
     std::vector<std::string> good = { "+5" };
     for (const auto& c : good)
         CPPUNIT_ASSERT(is_signed_number(c));
+}
+
+void TestParseNumber::t_ParseDigit()
+{
+    typedef std::pair<char, Number> Case;
+    std::vector<Case> cases = { {'1', 1},
+                                {'2', 2},
+                                {'3', 3},
+                                {'4', 4},
+                                {'5', 5},
+                                {'6', 6},
+                                {'7', 7},
+                                {'8', 8},
+                                {'9', 9},
+                                {'0', 0} };
+    for (const auto& c : cases)
+        CPPUNIT_ASSERT(parse_digit(c.first) == c.second);
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestParseNumber);
