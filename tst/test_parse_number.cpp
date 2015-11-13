@@ -60,7 +60,7 @@ void TestParseNumber::t_ParseDigit()
                                 {'9', 9},
                                 {'0', 0} };
     for (const auto& c : cases)
-        CPPUNIT_ASSERT(parse_digit(c.first) == c.second);
+        CPPUNIT_ASSERT(*(parse_digit(c.first)) == c.second);
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestParseNumber);
