@@ -28,7 +28,7 @@ bool is_signed_number(const std::string& num)
 //------------------------------------------------------------------------------
 MaybeNumber parse_digit(char c)
 {
-    if (!is_digit(c)) MaybeNumber();
+    if (!is_digit(c)) return MaybeNumber();
     return c - '0';
 }
 //------------------------------------------------------------------------------

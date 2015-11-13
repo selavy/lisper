@@ -1,5 +1,6 @@
 #include "test_parse_number.h"
 #include "parse_number.h"
+#include <iostream>
 #include <vector>
 #include <string>
 #include <utility>
@@ -61,6 +62,10 @@ void TestParseNumber::t_ParseDigit()
                                 {'0', 0} };
     for (const auto& c : cases)
         CPPUNIT_ASSERT(*(parse_digit(c.first)) == c.second);
+
+    std::vector<char> bad = {'a', 'b', 'Z', '-', 'T'};
+    for (const auto c : bad)
+        CPPUNIT_ASSERT(!parse_digit(c));
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestParseNumber);

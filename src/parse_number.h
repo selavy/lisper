@@ -21,4 +21,6 @@ bool is_signed_number(const std::string& num);
 
 MaybeNumber parse_digit(char c);
 
+//MaybeNumber parse_number(const std::string& num);
+
 #endif // PARSE_NUMBER__H_
