@@ -1,14 +1,16 @@
 #include "parse_number.h"
 #include <algorithm>
 #include <stdexcept>
-#include <numeric>
+#include <iterator>
+#include <iostream> //TEMP
 //------------------------------------------------------------------------------
 bool is_digit(char c)
 {
     return c >= '0' && c <= '9';
 }
 //------------------------------------------------------------------------------
-bool is_number(std::string::const_iterator begin, std::string::const_iterator end)
+bool is_number(std::string::const_iterator begin,
+               std::string::const_iterator end)
 {
     return begin != end && std::find_if_not(begin, end, is_digit) == end;
 }
@@ -33,8 +35,11 @@ MaybeNumber parse_digit(char c)
     return c - '0';
 }
 //------------------------------------------------------------------------------
-MaybeNumber parse_number(std::string::const_reverse_iterator rbegin, std::string::const_reverse_iterator rend)
+MaybeNumber parse_number(std::string::const_reverse_iterator rbegin,
+                         std::string::const_reverse_iterator rend)
 {
+    if (rbegin == rend) return MaybeNumber();
+    
     Number ret = 0;
     Number multiplier = 1;
 
@@ -51,5 +56,30 @@ MaybeNumber parse_number(std::string::const_reverse_iterator rbegin, std::string
 MaybeNumber parse_number(const std::string& num)
 {
     return parse_number(num.crbegin(), num.crend());
+}
+//------------------------------------------------------------------------------
+MaybeNumber parse_signed_number(std::string::const_reverse_iterator rbegin,
+                                std::string::const_reverse_iterator rend)
+{
+    if (rbegin == rend) return MaybeNumber();
+    char sign = *std::prev(rend);
+    if (sign == '-') {
+        MaybeNumber ret = parse_number(rbegin, std::prev(rend));
+        if (!ret) return MaybeNumber();
+        return *ret * -1;
+    }
+    else if (sign == '+') {
+        return parse_number(rbegin, std::prev(rend));
+    }
+    else {
+        return parse_number(rbegin, rend);
+    }
+    
+    return MaybeNumber();
+}
+//------------------------------------------------------------------------------
+MaybeNumber parse_signed_number(const std::string& num)
+{
+    return parse_signed_number(num.crbegin(), num.crend());
 }
 //------------------------------------------------------------------------------

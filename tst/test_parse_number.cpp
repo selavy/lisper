@@ -86,10 +86,43 @@ void TestParseNumber::t_ParseNumber()
         "asdf",
         "1000a",
         "0b101010",
-        "0xFF"
+        "0xFF",
+        ""
     };
     for (const auto& c: bad)
         CPPUNIT_ASSERT(!parse_number(c));
+}
+
+void TestParseNumber::t_ParseSignedNumber()
+{
+    typedef std::pair<std::string, Number> Case;
+    std::vector<Case> cases = {
+        {"1", 1},
+        {"11", 11},
+        {"12", 12},
+        {"100001", 100001},
+        {"-1", -1},
+        {"-11", -11},
+        {"-12", -12},
+        {"-100001", -100001}
+    };
+    for (const auto& c: cases)
+        CPPUNIT_ASSERT(*(parse_signed_number(c.first)) == c.second);
+
+    std::vector<std::string> bad = {
+        "asdf",
+        "1000a",
+        "0b101010",
+        "0xFF",
+        "",
+        "-asdf",
+        "-1000a",
+        "-0b101010",
+        "-0xFF",
+        "-"
+    };
+    for (const auto& c: bad)
+        CPPUNIT_ASSERT(!parse_signed_number(c));
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestParseNumber);

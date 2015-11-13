@@ -18,6 +18,7 @@ public:
     void t_IsSignedNumber();
     void t_ParseDigit();
     void t_ParseNumber();
+    void t_ParseSignedNumber();
 
     CPPUNIT_TEST_SUITE(TestParseNumber);
     CPPUNIT_TEST(t_IsSingleDigit);
@@ -25,6 +26,7 @@ public:
     CPPUNIT_TEST(t_IsSignedNumber);
     CPPUNIT_TEST(t_ParseDigit);
     CPPUNIT_TEST(t_ParseNumber);
+    CPPUNIT_TEST(t_ParseSignedNumber);
     CPPUNIT_TEST_SUITE_END();
 };
 
