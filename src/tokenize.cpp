@@ -1,5 +1,6 @@
 #include "tokenize.h"
 #include <algorithm>
+#include <iostream> //REMOVE(plesslie): DEBUG
 //------------------------------------------------------------------------------
 Tokens tokenize(std::istream& is)
 {
@@ -9,10 +10,12 @@ Tokens tokenize(std::istream& is)
         do {
             const auto pos = str.find_first_of("()");
             ret.push_back(str.substr(0, pos));
-            if (pos != std::string::npos) {
-                ret.push_back(str.substr(pos, 1));
-            }
+
+            if (pos == std::string::npos) break;
+            
+            ret.push_back(str.substr(pos, 1));
             str = str.substr(pos+1);
+
         } while(!str.empty());
     }
 

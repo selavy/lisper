@@ -11,7 +11,6 @@ add_executable(
   unittest.cpp
   )
 
-message("Ouputting unittest in: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 add_custom_command(TARGET unittest POST_BUILD COMMAND "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/unittest")
 add_custom_target(tests "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/unittest" DEPENDS unittest COMMENT "Running tests...")
 

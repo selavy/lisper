@@ -25,16 +25,18 @@ void TestTokenize::t_SpacesIgnored()
 {
     typedef std::pair<std::string, Tokens> Case;
     std::vector<Case> cases = {
-        // [test case]     , [expected result]
+        // [test case]      , [expected result]
         //---------------------------------------------
-        {"      \t\n"      , {}                       },
-        {"     ("          , {"("}                    },
-        {"(     + 1 \n\t2)", {"(", "+", "1", "2", ")"}}
+        {"      \t\n"       , {}                          },
+        {"     ("           , {"("}                       },
+        {"(     + 1 \n\t2)" , {"(", "+", "1", "2", ")"}   },
+        {"(+ 1 2)"          , {"(", "+", "1", "2", ")"}   },
+        {"( + 1 2 )"        , {"(", "+", "1", "2", ")"}   },
+        {"(+ 123 45)"       , {"(", "+", "123", "45", ")"}},
+        {"( + 123 \t\t45\n)", {"(", "+", "123", "45", ")"}}
     };
 
-    int num = 0;
     for (const auto& c : cases) {
-        std::cout << "Case #" << num++ << "\n";
         std::stringstream iss;
         iss << c.first;
         const auto ret = tokenize(iss);
