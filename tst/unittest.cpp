@@ -12,6 +12,7 @@
 
 // tests
 #include "test_parse_number.h"
+#include "test_tokenize.h"
 
 int main(int argc, char** argv)
 {
