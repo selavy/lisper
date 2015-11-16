@@ -6,30 +6,70 @@
 Tokens tokenize(std::istream& is)
 {
     Tokens ret;
-    std::string str;
-    while (is >> str) {
-        do {
-            const auto pos = str.find_first_of("()");
-            ret.push_back(str.substr(0, pos));
+    char c;
+    std::string curr;
+    std::string tmp;
+    bool inquote = false;
 
-            if (pos == std::string::npos) break;
-            
-            ret.push_back(str.substr(pos, 1));
-            str = str.substr(pos+1);
-
-        } while(!str.empty());
+    while(is.get(c)) {
+        if (inquote && c != '"') {
+            if (c == ';') {
+                throw std::runtime_error("Found ';' character inside string literal!");
+            }
+            curr += c;
+        }
+        else {
+            switch (c) {
+            case '"':
+                if (inquote) {
+                    curr += '"';
+                    ret.push_back(curr);
+                    curr = "";
+                }
+                else {
+                    inquote = true;
+                    curr = c;
+                }
+                break;
+            case ' ' : // skip whitespace
+            case '\t':
+            case '\n':
+            case '\r':
+                if (!curr.empty()) {
+                    ret.push_back(curr);
+                    curr = "";
+                }
+                break;
+            case ';': // comment
+                std::getline(is, tmp, '\n'); // get rest of line
+                break;
+            case '(': // begin expr
+                if (!curr.empty()) {
+                    ret.push_back(curr);
+                    curr = "";
+                }
+                ret.push_back("(");
+                break;
+            case ')': // end expr
+                if (!curr.empty()) {
+                    ret.push_back(curr);
+                    curr = "";
+                }
+                ret.push_back(")");
+                break;
+            default:
+                curr += c;
+            }
+        }
     }
-
-    auto pos = std::remove_if(std::begin(ret), std::end(ret),
-                              [](const std::string& s) { return s.empty(); });
-    ret.erase(pos, std::end(ret));
+    if (!curr.empty()) ret.push_back(curr);
+    
     return ret;
 }
 //------------------------------------------------------------------------------
 std::ostream& operator<<(std::ostream& os, const Tokens& tokens)
 {
     os << "Tokens( '";
-    // for (const auto token: tokens) os << "'" << token << "', ";
     std::copy(std::begin(tokens), std::end(tokens),
               infix_ostream_iterator<Tokens::value_type>(os, "', '"));
     os << "' )";
