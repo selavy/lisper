@@ -1,6 +1,7 @@
 #include "tokenize.h"
 #include <algorithm>
 #include <iostream> //REMOVE(plesslie): DEBUG
+#include "infix_iterator.h"
 //------------------------------------------------------------------------------
 Tokens tokenize(std::istream& is)
 {
@@ -27,8 +28,10 @@ Tokens tokenize(std::istream& is)
 //------------------------------------------------------------------------------
 std::ostream& operator<<(std::ostream& os, const Tokens& tokens)
 {
-    os << "Tokens( ";
-    for (const auto token: tokens) os << "'" << token << "' ";
-    os << ")";
+    os << "Tokens( '";
+    // for (const auto token: tokens) os << "'" << token << "', ";
+    std::copy(std::begin(tokens), std::end(tokens),
+              infix_ostream_iterator<Tokens::value_type>(os, "', '"));
+    os << "' )";
     return os;
 }
