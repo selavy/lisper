@@ -9,6 +9,7 @@
 #include "str.h"
 #include "vec.h"
 #include "number.h"
+#include "symbol.h"
 
 TestTypes::TestTypes()
 {
@@ -134,6 +135,21 @@ void TestTypes::t_PrintNumber()
         CPPUNIT_ASSERT_EQUAL(c.second, n.value());
         CPPUNIT_ASSERT_EQUAL(c.first, oss.str());
     }
+}
+
+void TestTypes::t_PrintSymbol()
+{
+    std::vector<std::string> expected = {
+        "'+", "'-", "'HELLO", "'writer"
+    };
+
+    for (const auto& exp : expected) {
+        Symbol symbol(exp);
+        std::ostringstream oss;
+        oss << symbol;
+        CPPUNIT_ASSERT_EQUAL(exp.substr(1), oss.str());
+    }
+    
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestTypes);

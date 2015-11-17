@@ -12,6 +12,7 @@ add_executable(
   ../src/str.cpp
   ../src/vec.cpp
   ../src/number.cpp
+  ../src/symbol.cpp
   test_parse_number.cpp
   test_tokenize.cpp
   test_types.cpp

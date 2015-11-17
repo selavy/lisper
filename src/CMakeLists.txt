@@ -10,6 +10,7 @@ add_executable(
   str.cpp
   vec.cpp
   number.cpp
+  symbol.cpp
   main.cpp
   )
 
