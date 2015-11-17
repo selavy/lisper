@@ -12,6 +12,7 @@ public:
     String(const char* str);
     const std::string& value() const;
     void print(std::ostream& os) const;
+    String& operator+(const String& str);
 
 private:
     std::string str_;

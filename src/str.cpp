@@ -34,3 +34,9 @@ void String::print(std::ostream& os) const
 {
     os << str_;
 }
+
+String& String::operator+(const String& str)
+{
+    str_ += str.str_;
+    return *this;
+}
