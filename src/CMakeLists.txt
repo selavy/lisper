@@ -7,6 +7,7 @@ add_executable(
   object.cpp
   empty.cpp
   boolean.cpp
+  str.cpp
   main.cpp
   )
 

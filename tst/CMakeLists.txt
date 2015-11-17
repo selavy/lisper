@@ -9,6 +9,7 @@ add_executable(
   ../src/object.cpp
   ../src/empty.cpp
   ../src/boolean.cpp
+  ../src/str.cpp
   test_parse_number.cpp
   test_tokenize.cpp
   test_types.cpp
