@@ -1,6 +1,5 @@
 #include "vec.h"
-#include "infix_iterator.h"
-
+#include "infix_iterator.h" 
 Vector::Vector()
     : data_()
 {
