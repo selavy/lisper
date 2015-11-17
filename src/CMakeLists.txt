@@ -6,6 +6,7 @@ add_executable(
   tokenize.cpp
   object.cpp
   empty.cpp
+  boolean.cpp
   main.cpp
   )
 

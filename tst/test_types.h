@@ -14,9 +14,11 @@ public:
     virtual void tearDown();
 
     void t_PrintEmpty();
+    void t_PrintBoolean();
 
     CPPUNIT_TEST_SUITE(TestTypes);
     CPPUNIT_TEST(t_PrintEmpty);
+    CPPUNIT_TEST(t_PrintBoolean);    
     CPPUNIT_TEST_SUITE_END();
 };
 
