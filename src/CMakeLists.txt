@@ -4,6 +4,8 @@ add_executable(
   lisper
   parse_number.cpp
   tokenize.cpp
+  object.cpp
+  empty.cpp
   main.cpp
   )
 

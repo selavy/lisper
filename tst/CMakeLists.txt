@@ -6,8 +6,11 @@ add_executable(
   unittest
   ../src/parse_number.cpp
   ../src/tokenize.cpp
+  ../src/object.cpp
+  ../src/empty.cpp
   test_parse_number.cpp
   test_tokenize.cpp
+  test_types.cpp
   unittest.cpp
   )
 
