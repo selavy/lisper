@@ -7,6 +7,7 @@
 #include "empty.h"
 #include "boolean.h"
 #include "str.h"
+#include "vec.h"
 
 TestTypes::TestTypes()
 {
@@ -73,6 +74,40 @@ void TestTypes::t_PrintString()
         oss << *obj;
         CPPUNIT_ASSERT_EQUAL(c, oss.str());
     }
+}
+
+void TestTypes::t_PrintVector()
+{
+    std::vector<std::unique_ptr<Object>> objs;
+    typedef std::pair<std::string, std::string> Case;
+    std::vector<Case> vals = {
+        {"string", "\"Hello\""},
+        {"string", "\"World\""},
+        {"boolean", "#t"},
+        {"empty", ""}
+    };
+        
+    for (const auto& it : vals) {
+        if (it.first == "string") {
+            objs.emplace_back(new String(it.second.c_str()));
+        }
+        else if (it.first == "boolean") {
+            objs.emplace_back(new Boolean(it.second.c_str()));
+        }
+        else if (it.first == "empty") {
+            objs.emplace_back(new Empty);
+        }
+    }
+
+    std::unique_ptr<Vector> vec(new Vector);
+    for (const auto& it : objs) {
+        vec->push_back(*(it.get()));
+    }
+
+    std::ostringstream oss;
+    oss << *vec;
+    std::string expected = "( 'Hello', 'World', '#t', '()' )";
+    CPPUNIT_ASSERT_EQUAL(expected, oss.str());
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestTypes);
