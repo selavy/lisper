@@ -5,8 +5,8 @@
 #include <cstdint>
 #include <boost/optional.hpp>
 
-typedef int64_t Number;
-typedef boost::optional<Number> MaybeNumber;
+typedef int64_t BigNumber;
+typedef boost::optional<BigNumber> MaybeNumber;
 
 // digit := [0-9]
 bool is_digit(char c);

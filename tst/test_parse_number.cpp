@@ -49,7 +49,7 @@ void TestParseNumber::t_IsSignedNumber()
 
 void TestParseNumber::t_ParseDigit()
 {
-    typedef std::pair<char, Number> Case;
+    typedef std::pair<char, typename MaybeNumber::value_type> Case;
     std::vector<Case> cases = {
         {'1', 1},
         {'2', 2},
@@ -72,7 +72,7 @@ void TestParseNumber::t_ParseDigit()
 
 void TestParseNumber::t_ParseNumber()
 {
-    typedef std::pair<std::string, Number> Case;
+    typedef std::pair<std::string, typename MaybeNumber::value_type> Case;
     std::vector<Case> cases = {
         {"1", 1},
         {"11", 11},
@@ -95,7 +95,7 @@ void TestParseNumber::t_ParseNumber()
 
 void TestParseNumber::t_ParseSignedNumber()
 {
-    typedef std::pair<std::string, Number> Case;
+    typedef std::pair<std::string, typename MaybeNumber::value_type> Case;
     std::vector<Case> cases = {
         {"1", 1},
         {"11", 11},

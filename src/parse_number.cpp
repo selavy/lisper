@@ -40,8 +40,8 @@ MaybeNumber parse_number(std::string::const_reverse_iterator rbegin,
 {
     if (rbegin == rend) return MaybeNumber();
     
-    Number ret = 0;
-    Number multiplier = 1;
+    BigNumber ret = 0;
+    BigNumber multiplier = 1;
 
     for (; rbegin != rend; ++rbegin) {
         MaybeNumber digit = parse_digit(*rbegin);

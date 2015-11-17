@@ -8,15 +8,18 @@
 class Vector : public Object
 {
 public:
+    typedef std::reference_wrapper<const Object> CRObject;
+    typedef std::vector<CRObject> Objects;
+public:
     Vector();
+
+    Vector(Objects objs);
 
     void push_back(const Object& obj);
 
     void print(std::ostream& os) const;
     
 private:
-    typedef std::reference_wrapper<const Object> CRObject;
-    typedef std::vector<CRObject> Objects;
     Objects data_;
 };
 

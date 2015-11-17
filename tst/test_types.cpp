@@ -8,6 +8,7 @@
 #include "boolean.h"
 #include "str.h"
 #include "vec.h"
+#include "number.h"
 
 TestTypes::TestTypes()
 {
@@ -108,6 +109,31 @@ void TestTypes::t_PrintVector()
     oss << *vec;
     std::string expected = "( 'Hello', 'World', '#t', '()' )";
     CPPUNIT_ASSERT_EQUAL(expected, oss.str());
+}
+
+void TestTypes::t_PrintNumber()
+{
+    Number num;
+    CPPUNIT_ASSERT_EQUAL(num.value(), 0L);
+    std::ostringstream oss;
+    oss << num;
+    CPPUNIT_ASSERT_EQUAL(std::string("0"), oss.str());
+
+    typedef std::pair<std::string, int64_t> Case;
+    std::vector<Case> cases = {
+        {"0", 0L},
+        {"100", 100L},
+        {"100000", 100000L},
+        {"2", 2L}
+    };
+
+    for (const auto& c : cases) {
+        Number n(c.first.c_str());
+        std::ostringstream oss;
+        oss << n;
+        CPPUNIT_ASSERT_EQUAL(c.second, n.value());
+        CPPUNIT_ASSERT_EQUAL(c.first, oss.str());
+    }
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestTypes);

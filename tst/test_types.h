@@ -17,12 +17,14 @@ public:
     void t_PrintBoolean();
     void t_PrintString();
     void t_PrintVector();
+    void t_PrintNumber();
 
     CPPUNIT_TEST_SUITE(TestTypes);
     CPPUNIT_TEST(t_PrintEmpty);
     CPPUNIT_TEST(t_PrintBoolean);
     CPPUNIT_TEST(t_PrintString);
     CPPUNIT_TEST(t_PrintVector);
+    CPPUNIT_TEST(t_PrintNumber);
     CPPUNIT_TEST_SUITE_END();
 };
 

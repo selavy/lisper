@@ -5,6 +5,11 @@ Vector::Vector()
 {
 }
 
+Vector::Vector(Objects objs)
+    : data_(std::move(objs))
+{
+}
+
 void Vector::push_back(const Object& obj)
 {
     data_.push_back(obj);

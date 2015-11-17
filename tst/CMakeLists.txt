@@ -11,6 +11,7 @@ add_executable(
   ../src/boolean.cpp
   ../src/str.cpp
   ../src/vec.cpp
+  ../src/number.cpp
   test_parse_number.cpp
   test_tokenize.cpp
   test_types.cpp

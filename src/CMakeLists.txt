@@ -9,6 +9,7 @@ add_executable(
   boolean.cpp
   str.cpp
   vec.cpp
+  number.cpp
   main.cpp
   )
 
