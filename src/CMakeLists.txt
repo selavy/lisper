@@ -11,6 +11,8 @@ add_executable(
   vec.cpp
   number.cpp
   symbol.cpp
+  procedure.cpp
+  primitive.cpp
   main.cpp
   )
 

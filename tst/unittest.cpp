@@ -13,6 +13,8 @@
 // tests
 #include "test_parse_number.h"
 #include "test_tokenize.h"
+#include "test_types.h"
+#include "test_primitives.h"
 
 int main(int argc, char** argv)
 {

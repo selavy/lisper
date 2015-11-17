@@ -28,3 +28,9 @@ void Number::print(std::ostream& os) const
 {
     os << val_;
 }
+
+Number& Number::operator+(const Number& number)
+{
+    this->val_ += number.val_;
+    return *this;
+}

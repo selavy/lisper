@@ -13,9 +13,12 @@ add_executable(
   ../src/vec.cpp
   ../src/number.cpp
   ../src/symbol.cpp
+  ../src/primitive.cpp
+  ../src/procedure.cpp
   test_parse_number.cpp
   test_tokenize.cpp
   test_types.cpp
+  test_primitives.cpp
   unittest.cpp
   )
 

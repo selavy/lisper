@@ -13,6 +13,7 @@ public:
     Number(const char* str);
     value_type value() const;
     void print(std::ostream& os) const override;
+    Number& operator+(const Number& number);
 
 private:
     int64_t val_;
