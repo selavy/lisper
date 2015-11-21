@@ -19,7 +19,6 @@ void TestPrimitives::t_PlusZeroArgsReturnsZero()
 void TestPrimitives::t_OnePlusOneIsTwo()
 {
     Primitive prim("+");
-
     std::unique_ptr<Object> num1(new Number("1"));
     std::unique_ptr<Object> num2(new Number("1"));
     Procedure::Arguments args{*num1.get(), *num2.get()};

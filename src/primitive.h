@@ -19,4 +19,7 @@ private:
     std::string name_;
 };
 
+// returns NULL if not a primitive
+std::unique_ptr<Object> createPrimitive(std::string val);
+
 #endif // PRIMITIVE__H_
