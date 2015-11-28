@@ -14,9 +14,11 @@ public:
     virtual void tearDown();
 
     void t_EmptyString();
+    void t_BasicStrings();
 
     CPPUNIT_TEST_SUITE(TestString);
     CPPUNIT_TEST(t_EmptyString);
+    CPPUNIT_TEST(t_BasicStrings);    
     CPPUNIT_TEST_SUITE_END();
 };
 
