@@ -14,6 +14,7 @@
 // #include "test_parse_number.h"
 #include "test_tokenize.h"
 #include "test_integer.h"
+#include "test_string.h"
 // #include "test_types.h"
 // #include "test_primitives.h"
 

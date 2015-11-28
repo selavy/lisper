@@ -11,7 +11,7 @@ add_executable(
   object_factory.cpp
   # empty.cpp
   # boolean.cpp
-  # str.cpp
+  str.cpp
   # vec.cpp
 
   # symbol.cpp

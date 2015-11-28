@@ -11,7 +11,7 @@ add_executable(
   ../src/integer.cpp
   # ../src/empty.cpp
   # ../src/boolean.cpp
-  # ../src/str.cpp
+  ../src/str.cpp
   # ../src/vec.cpp
 
   # ../src/symbol.cpp
@@ -20,6 +20,7 @@ add_executable(
   # test_parse_number.cpp
   test_tokenize.cpp
   test_integer.cpp
+  test_string.cpp
   # test_types.cpp
   # test_primitives.cpp
   unittest.cpp

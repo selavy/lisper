@@ -9,10 +9,30 @@ class String : public Object
 {
 public:
     String();
+
     String(const char* str);
-    const std::string& value() const;
-    void print(std::ostream& os) const;
-    String& operator+(const String& str);
+
+    virtual ~String();
+
+    virtual std::string toString() const override;
+
+    virtual std::string typeToString() const override;
+
+    virtual bool isBoolean() const override;
+
+    virtual bool isSymbol() const override;
+
+    virtual bool isChar() const override;
+
+    virtual bool isVector() const override;
+
+    virtual bool isPair() const override;
+
+    virtual bool isNumber() const override;
+
+    virtual bool isString() const override;
+
+    virtual bool isProcedure() const override;
 
 private:
     std::string str_;

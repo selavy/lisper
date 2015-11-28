@@ -25,18 +25,57 @@ String::String(const char* str)
     }
 }
 
-const std::string& String::value() const
+String::~String()
+{
+}
+
+std::string String::toString() const
 {
     return str_;
 }
 
-void String::print(std::ostream& os) const
+std::string String::typeToString() const
 {
-    os << str_;
+    return "String";
 }
 
-String& String::operator+(const String& str)
+bool String::isBoolean() const
 {
-    str_ += str.str_;
-    return *this;
+    return false;
 }
+
+bool String::isSymbol() const
+{
+    return false;
+}
+
+bool String::isChar() const
+{
+    return false;
+}
+
+bool String::isVector() const
+{
+    return false;
+}
+
+bool String::isPair() const
+{
+    return false;
+}
+
+bool String::isNumber() const
+{
+    return false;
+}
+
+bool String::isString() const
+{
+    return true;
+}
+
+bool String::isProcedure() const
+{
+    return false;
+}
+
