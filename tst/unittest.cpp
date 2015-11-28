@@ -10,13 +10,11 @@
 #include <cppunit/CompilerOutputter.h>
 #include <cppunit/XmlOutputter.h>
 
-// tests
-// #include "test_parse_number.h"
+//BEGIN TESTS
 #include "test_tokenize.h"
 #include "test_integer.h"
 #include "test_string.h"
-// #include "test_types.h"
-// #include "test_primitives.h"
+//END TESTS
 
 int main(int argc, char** argv)
 {
@@ -40,3 +38,6 @@ int main(int argc, char** argv)
     
     return !collectedresults.wasSuccessful();
 }
+
+
+
