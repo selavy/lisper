@@ -14,6 +14,7 @@
 #include "test_tokenize.h"
 #include "test_integer.h"
 #include "test_string.h"
+#include "test_boolean.h"
 //END TESTS
 
 int main(int argc, char** argv)
@@ -38,6 +39,7 @@ int main(int argc, char** argv)
     
     return !collectedresults.wasSuccessful();
 }
+
 
 
 

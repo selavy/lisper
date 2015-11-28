@@ -6,6 +6,7 @@
 #include "number.h"
 #include "integer.h"
 #include "str.h"
+#include "boolean.h"
 #include "abstract_syntax_tree.h"
 
 ObjectPtr process(const char* str)
@@ -29,6 +30,9 @@ ObjectPtr process(const char* str)
         else if (std::isdigit(token[0])) {
             return ObjectPtr(new Integer(token.c_str()));
         }
+        else if (Boolean::isBoolean(token.c_str())) {
+            return ObjectPtr(new Boolean(token.c_str()));
+        }
         else {
             std::cout << "SYMBOL\n";
         }
@@ -43,7 +47,9 @@ int main(int argc, char** argv)
         "\"Hello\"",
         "1",
         "100",
-        "10000"
+        "10000",
+        "#t",
+        "#f"
 //        "(+ 1 2)"
     };
 
