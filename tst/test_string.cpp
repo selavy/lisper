@@ -20,7 +20,7 @@ void TestString::t_EmptyString()
 {
     String str;
     CPPUNIT_ASSERT_EQUAL(std::string("String"), str.typeToString());
-    CPPUNIT_ASSERT_EQUAL(std::string(), str.toString());
+    CPPUNIT_ASSERT_EQUAL(std::string("\"\""), str.toString());
 }
 
 void TestString::t_BasicStrings()
@@ -36,7 +36,7 @@ void TestString::t_BasicStrings()
     for (const auto& c: cases) {
         std::string tmp = '"' + c + '"';
         String str(tmp.c_str());
-        CPPUNIT_ASSERT_EQUAL(c, str.toString());
+        CPPUNIT_ASSERT_EQUAL(tmp, str.toString());
     }
 }
 

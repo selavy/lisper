@@ -31,7 +31,7 @@ String::~String()
 
 std::string String::toString() const
 {
-    return str_;
+    return '"' + str_ + '"';
 }
 
 std::string String::typeToString() const
