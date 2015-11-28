@@ -4,21 +4,24 @@ include_directories("${CMAKE_SOURCE_DIR}/src")
 
 add_executable(
   unittest
-  ../src/parse_number.cpp
+  # ../src/parse_number.cpp
   ../src/tokenize.cpp
   ../src/object.cpp
-  ../src/empty.cpp
-  ../src/boolean.cpp
-  ../src/str.cpp
-  ../src/vec.cpp
   ../src/number.cpp
-  ../src/symbol.cpp
-  ../src/primitive.cpp
-  ../src/procedure.cpp
-  test_parse_number.cpp
+  ../src/integer.cpp
+  # ../src/empty.cpp
+  # ../src/boolean.cpp
+  # ../src/str.cpp
+  # ../src/vec.cpp
+
+  # ../src/symbol.cpp
+  # ../src/primitive.cpp
+  # ../src/procedure.cpp
+  # test_parse_number.cpp
   test_tokenize.cpp
-  test_types.cpp
-  test_primitives.cpp
+  test_integer.cpp
+  # test_types.cpp
+  # test_primitives.cpp
   unittest.cpp
   )
 

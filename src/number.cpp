@@ -1,36 +1,41 @@
 #include "number.h"
-#include "parse_number.h"
 
-Number::Number()
-    : val_(0)
+bool Number::isBoolean() const
 {
+    return false;
 }
 
-Number::Number(value_type val)
-    : val_(val)
+bool Number::isSymbol() const
 {
+    return false;
 }
 
-Number::Number(const char* str)
-    : val_(0)
+bool Number::isChar() const
 {
-    const auto n = parse_number(str);
-    if (!n) throw std::runtime_error(std::string("Invalid number: ") + str);
-    val_ = *n;
+    return false;    
 }
 
-Number::value_type Number::value() const
+bool Number::isVector() const
 {
-    return val_;
+    return false;
 }
 
-void Number::print(std::ostream& os) const
+bool Number::isPair() const
 {
-    os << val_;
+    return false;    
 }
 
-Number& Number::operator+(const Number& number)
+bool Number::isNumber() const
 {
-    this->val_ += number.val_;
-    return *this;
+    return true;
+}
+
+bool Number::isString() const
+{
+    return false;    
+}
+
+bool Number::isProcedure() const
+{
+    return false;    
 }

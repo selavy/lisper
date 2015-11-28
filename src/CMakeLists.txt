@@ -2,17 +2,21 @@
 
 add_executable(
   lisper
-  parse_number.cpp
+  # parse_number.cpp
   tokenize.cpp
   object.cpp
-  empty.cpp
-  boolean.cpp
-  str.cpp
-  vec.cpp
   number.cpp
-  symbol.cpp
-  procedure.cpp
-  primitive.cpp
+  integer.cpp
+  abstract_syntax_tree.cpp
+  object_factory.cpp
+  # empty.cpp
+  # boolean.cpp
+  # str.cpp
+  # vec.cpp
+
+  # symbol.cpp
+  # procedure.cpp
+  # primitive.cpp
   main.cpp
   )
 

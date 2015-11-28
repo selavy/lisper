@@ -6,17 +6,14 @@
 class Number : public Object
 {
 public:
-    typedef int64_t value_type;
-public:
-    Number();
-    Number(value_type val);
-    Number(const char* str);
-    value_type value() const;
-    void print(std::ostream& os) const override;
-    Number& operator+(const Number& number);
-
-private:
-    int64_t val_;
+    virtual bool isBoolean() const override;
+    virtual bool isSymbol() const override;
+    virtual bool isChar() const override;
+    virtual bool isVector() const override;
+    virtual bool isPair() const override;
+    virtual bool isNumber() const override;
+    virtual bool isString() const override;
+    virtual bool isProcedure() const override;
 };
 
 #endif // NUMBER__H_
