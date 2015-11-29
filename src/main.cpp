@@ -9,7 +9,7 @@
 #include "integer.h"
 #include "str.h"
 #include "boolean.h"
-#include "abstract_syntax_tree.h"
+#include "symbol.h"
 
 template <class CONT>
 std::deque<typename CONT::value_type> toDeque(const CONT& container)
@@ -31,8 +31,11 @@ ObjectPtr interpretSimpleToken(Token token)
     else if (Boolean::isBoolean(token.c_str())) {
         return ObjectPtr(new Boolean(token.c_str()));
     }
+    else if (token == ")" || token == "(") {
+        throw std::runtime_error("Invalid token: " + token); 
+    }
     else {
-        throw std::runtime_error("Unrecognized token: " + token + "!");
+        return ObjectPtr(new Symbol(token.c_str()));
     }
 }
 
@@ -42,45 +45,21 @@ ObjectPtr readFromTokens(std::deque<Token>& tokens)
         throw std::runtime_error("Unexpected EOF!");
     }
 
-    for (const auto& token: tokens) {
-        if (token == "(") {
-             
-        }
-        else if (token == ")") {
-            continue;
-        }
-        else {
-            return interpretSimpleToken(token);
-        }
+    Token token = tokens.front();
+    tokens.pop_front();
+
+    if (token == "(") {
+        // Token next = tokens.front();
+        // ObjectPtr head(new Pair);
+        // while (next != ")") {
+        // }
     }
-
+    else if (token == ")") {
+    }
+    else {
+        return interpretSimpleToken(token);
+    }
     return ObjectPtr();
-
-    // Token token = tokens.front();
-    // tokens.pop_front();
-    // if (token == "(") {
-    //     std::cout << "BEGIN EXPR\n";
-    //     // while (token != ")") {
-            
-    //     // }
-    // }
-    // // else if (token == ")") {
-    // //     std::cout << "END EXPR\n";
-    // // }
-    // else if (token[0] == '"') {
-    //     return ObjectPtr(new String(token.c_str()));
-    // }
-    // else if (std::isdigit(token[0])) {
-    //     return ObjectPtr(new Integer(token.c_str()));
-    // }
-    // else if (Boolean::isBoolean(token.c_str())) {
-    //     return ObjectPtr(new Boolean(token.c_str()));
-    // }
-    // else {
-    //     // check if primitive
-    //     std::cout << "SYMBOL\n";
-    // }
-    // return ObjectPtr();
 }
 
 ObjectPtr process(const char* str)

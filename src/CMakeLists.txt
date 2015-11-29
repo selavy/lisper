@@ -7,10 +7,9 @@ add_executable(
   number.cpp
   integer.cpp
   boolean.cpp  
-  abstract_syntax_tree.cpp
-  object_factory.cpp
   pair.cpp
   str.cpp
+  symbol.cpp
   main.cpp
   )
 

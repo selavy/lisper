@@ -11,6 +11,7 @@ add_executable(
   ../src/str.cpp
   ../src/boolean.cpp
   ../src/pair.cpp
+  ../src/symbol.cpp
   #BEGIN TESTS
   test_tokenize.cpp
   test_integer.cpp
