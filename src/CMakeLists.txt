@@ -10,6 +10,7 @@ add_executable(
   pair.cpp
   str.cpp
   symbol.cpp
+  empty.cpp
   main.cpp
   )
 
