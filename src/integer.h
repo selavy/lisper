@@ -21,7 +21,7 @@ public:
 
     std::string typeToString() const;
 
-    value_type getValue() const;
+    value_type value() const;
 
 private:
     value_type val_;

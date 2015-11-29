@@ -58,7 +58,7 @@ std::string Integer::typeToString() const
     return "Integer";
 }
 
-Integer::value_type Integer::getValue() const
+Integer::value_type Integer::value() const
 {
     return val_;
 }

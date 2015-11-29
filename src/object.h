@@ -4,6 +4,7 @@
 #include <ostream>
 #include <string>
 #include <memory>
+#include <boost/core/null_deleter.hpp>
 
 struct Object
 {

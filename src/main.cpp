@@ -9,6 +9,39 @@
 #include "boolean.h"
 #include "abstract_syntax_tree.h"
 
+// ObjectPtr readFromTokens(std::deque<Tokens>& tokens)
+// {
+//     if (tokens.empty()) {
+//         throw std::runtime_error("Unexpected EOF!");
+//     }
+
+//     Token token = tokens.front();
+//     tokens.pop_front();
+    
+//     if (token == "(") {
+//         std::cout << "BEGIN EXPR\n";
+//         while (token != ")") {
+            
+//         }
+//     }
+//     // else if (token == ")") {
+//     //     std::cout << "END EXPR\n";
+//     // }
+//     else if (token[0] == '"') {
+//         return ObjectPtr(new String(token.c_str()));
+//     }
+//     else if (std::isdigit(token[0])) {
+//         return ObjectPtr(new Integer(token.c_str()));
+//     }
+//     else if (Boolean::isBoolean(token.c_str())) {
+//         return ObjectPtr(new Boolean(token.c_str()));
+//     }
+//     else {
+//         // check if primitive
+//         std::cout << "SYMBOL\n";
+//     }
+// }
+
 ObjectPtr process(const char* str)
 {
     std::cout << "> " << str << std::endl;
@@ -17,26 +50,9 @@ ObjectPtr process(const char* str)
     const auto tokens = tokenize(ss);
     // std::cout << "Tokens: " << tokens << std::endl;
 
-    for (const auto& token: tokens) {
-        if (token == "(") {
-            std::cout << "BEGIN EXPR\n";
-        }
-        else if (token == ")") {
-            std::cout << "END EXPR\n";
-        }
-        else if (token[0] == '"') {
-            return ObjectPtr(new String(token.c_str()));
-        }
-        else if (std::isdigit(token[0])) {
-            return ObjectPtr(new Integer(token.c_str()));
-        }
-        else if (Boolean::isBoolean(token.c_str())) {
-            return ObjectPtr(new Boolean(token.c_str()));
-        }
-        else {
-            std::cout << "SYMBOL\n";
-        }
-    }
+    // for (const auto& token: tokens) {
+
+    // }
 
     return ObjectPtr();
 }
@@ -69,6 +85,7 @@ int main(int argc, char** argv)
     // string, if starts with '"'
     // number, if starts with digit
     // boolean if is "#f" or "#t"
+    // character if starts with "#\..."
     // conditional if is "if" (impl "cond" in terms of "if")
     // else symbol
     

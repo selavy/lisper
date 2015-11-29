@@ -30,12 +30,12 @@ void TestInteger::t_ParseDigit()
     };
     for (const auto& it : cases) {
         Integer i(it.first.c_str());
-        CPPUNIT_ASSERT_EQUAL(it.second, i.getValue());
+        CPPUNIT_ASSERT_EQUAL(it.second, i.value());
     }
 
     for (int64_t val = 0LL; val < 10; ++val) {
         Integer i(val);
-        CPPUNIT_ASSERT_EQUAL(val, i.getValue());
+        CPPUNIT_ASSERT_EQUAL(val, i.value());
     }
 }
 

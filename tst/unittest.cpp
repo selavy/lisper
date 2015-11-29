@@ -15,6 +15,7 @@
 #include "test_integer.h"
 #include "test_string.h"
 #include "test_boolean.h"
+#include "test_pair.h"
 //END TESTS
 
 int main(int argc, char** argv)
@@ -39,6 +40,7 @@ int main(int argc, char** argv)
     
     return !collectedresults.wasSuccessful();
 }
+
 
 
 

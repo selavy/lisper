@@ -9,6 +9,7 @@ add_executable(
   boolean.cpp  
   abstract_syntax_tree.cpp
   object_factory.cpp
+  pair.cpp
   # empty.cpp
   str.cpp
   # vec.cpp
