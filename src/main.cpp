@@ -54,7 +54,7 @@ ObjectPtr evaluate(std::list<Token>& tokens)
     }
     else if (token[0] == '(') {
         //[TODO: implement recursive case]
-        return evaluate(tokens);
+        return ObjectPtr(new Pair(evaluate(tokens).release(), ObjectPtr(new Empty).release()));
     }
     else if (token[0] == ')') {
         return ObjectPtr(new Empty);
@@ -81,8 +81,8 @@ int main(int argc, char** argv)
         "100",
         "10000",
         "#t",
-        "#f" //,
-        // "(+ 1 2)"
+        "#f",
+        "(+ 1 2)"
     };
 
     for (const auto& c : cases)
