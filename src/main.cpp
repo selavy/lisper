@@ -9,6 +9,7 @@
 #include "integer.h"
 #include "str.h"
 #include "boolean.h"
+#include "pair.h"
 #include "symbol.h"
 
 template <class CONT>
@@ -39,6 +40,25 @@ ObjectPtr interpretSimpleToken(Token token)
     }
 }
 
+ObjectPtr readTail(std::deque<Token>& tokens)
+{
+    if (tokens.empty()) {
+        return ObjectPtr();
+    }
+
+    Token token = tokens.front();
+    tokens.pop_front();
+    if (token == ")") {
+        return ObjectPtr();
+    }
+    else if (token == "(") {
+        return ObjectPtr(new Pair(readTail(tokens).release(), nullptr));
+    }
+    else {
+        return interpretSimpleToken(token);
+    }
+}
+
 ObjectPtr readFromTokens(std::deque<Token>& tokens)
 {
     if (tokens.empty()) {
@@ -49,10 +69,16 @@ ObjectPtr readFromTokens(std::deque<Token>& tokens)
     tokens.pop_front();
 
     if (token == "(") {
-        // Token next = tokens.front();
-        // ObjectPtr head(new Pair);
-        // while (next != ")") {
-        // }
+        Token next = tokens.front();
+//        tokens.pop_front();
+        if (next == ")") {
+            return ObjectPtr(); // '() -> null
+        }
+        else {
+            ObjectPtr head = readTail(tokens);
+            ObjectPtr tail = readFromTokens(tokens);
+            return CONS(head, tail);
+        }
     }
     else if (token == ")") {
     }
@@ -74,12 +100,12 @@ ObjectPtr process(const char* str)
 int main(int argc, char** argv)
 {
     std::vector<std::string> cases = {
-        "\"Hello\"",
-        "1",
-        "100",
-        "10000",
-        "#t",
-        "#f",
+        // "\"Hello\"",
+        // "1",
+        // "100",
+        // "10000",
+        // "#t",
+        // "#f",
         "(+ 1 2)"
     };
 
