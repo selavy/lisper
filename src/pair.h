@@ -45,4 +45,8 @@ ObjectPtr cons(ObjectPtr first, ObjectPtr second);
 
 #define CONS(f, s) cons(std::move(f), std::move(s))
 
+#define CAR(p) p->first()
+
+#define CDR(p) p->second()
+
 #endif // PAIR__H_

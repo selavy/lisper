@@ -59,12 +59,12 @@ void TestPair::t_ListFromPairs()
     ObjectPtr myPair = CONS(a, CONS(b, tail));
 
     Pair const* curr = dynamic_cast<Pair const*>(myPair.get());
-    CPPUNIT_ASSERT_EQUAL(100L, dynamic_cast<Integer*>(curr->first().get())->value());
-    curr = dynamic_cast<Pair const*>(curr->second().get());
-    CPPUNIT_ASSERT_EQUAL(200L, dynamic_cast<Integer*>(curr->first().get())->value());
-    curr = dynamic_cast<Pair const*>(curr->second().get());
-    CPPUNIT_ASSERT_EQUAL(300L, dynamic_cast<Integer*>(curr->first().get())->value());
-    curr = dynamic_cast<Pair const*>(curr->second().get());
+    CPPUNIT_ASSERT_EQUAL(100L, dynamic_cast<Integer*>(CAR(curr).get())->value());
+    curr = dynamic_cast<Pair const*>(CDR(curr).get());
+    CPPUNIT_ASSERT_EQUAL(200L, dynamic_cast<Integer*>(CAR(curr).get())->value());
+    curr = dynamic_cast<Pair const*>(CDR(curr).get());
+    CPPUNIT_ASSERT_EQUAL(300L, dynamic_cast<Integer*>(CAR(curr).get())->value());
+    curr = dynamic_cast<Pair const*>(CDR(curr).get());
     CPPUNIT_ASSERT(!curr);    
 
     // std::stringstream ss;
