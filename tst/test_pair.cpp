@@ -56,9 +56,20 @@ void TestPair::t_ListFromPairs()
     ObjectPtr c(new Integer("300"));
 
     ObjectPtr tail(new Pair(c.release(), nullptr));
-    ObjectPtr myPair = CONS(CONS(a, b), tail);
+    ObjectPtr myPair = CONS(a, CONS(b, tail));
 
-    
+    Pair const* curr = dynamic_cast<Pair const*>(myPair.get());
+    CPPUNIT_ASSERT_EQUAL(100L, dynamic_cast<Integer*>(curr->first().get())->value());
+    curr = dynamic_cast<Pair const*>(curr->second().get());
+    CPPUNIT_ASSERT_EQUAL(200L, dynamic_cast<Integer*>(curr->first().get())->value());
+    curr = dynamic_cast<Pair const*>(curr->second().get());
+    CPPUNIT_ASSERT_EQUAL(300L, dynamic_cast<Integer*>(curr->first().get())->value());
+    curr = dynamic_cast<Pair const*>(curr->second().get());
+    CPPUNIT_ASSERT(!curr);    
+
+    // std::stringstream ss;
+    // ss << *myPair;
+    // std::cout << ss.str() << std::endl;
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestPair);

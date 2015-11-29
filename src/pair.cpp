@@ -38,6 +38,9 @@ std::string Pair::toString() const
         if (second_) {
             ret << *second_;
         }
+        else {
+            ret << "'()";
+        }
         ret << ")";
     }
     return ret.str();
