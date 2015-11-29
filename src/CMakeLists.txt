@@ -10,12 +10,7 @@ add_executable(
   abstract_syntax_tree.cpp
   object_factory.cpp
   pair.cpp
-  # empty.cpp
   str.cpp
-  # vec.cpp
-  # symbol.cpp
-  # procedure.cpp
-  # primitive.cpp
   main.cpp
   )
 
