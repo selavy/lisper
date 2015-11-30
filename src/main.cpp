@@ -23,6 +23,18 @@ std::list<typename CONT::value_type> toList(const CONT& container)
     return ret;
 }
 
+ObjectPtr createList(ObjectPtr curr, std::list<ObjectPtr>& tokens)
+{
+    if (tokens.empty()) {
+        return curr;
+    }
+    else {
+        Object* front = tokens.front().release();
+        tokens.pop_front();
+        return createList(std::move(ObjectPtr(new Pair(front, curr.release()))), tokens);
+    }
+}
+
 ObjectPtr evaluate(std::list<Token>& tokens)
 {
     // Base cases:
@@ -53,8 +65,18 @@ ObjectPtr evaluate(std::list<Token>& tokens)
         return ObjectPtr(new Boolean(token.c_str()));
     }
     else if (token[0] == '(') {
-        //[TODO: implement recursive case]
-        return ObjectPtr(new Pair(evaluate(tokens).release(), ObjectPtr(new Empty).release()));
+        Token front = tokens.front();
+        std::list<ObjectPtr> lst;
+        int counter = 0;
+        while (front != ")" && counter < 10) {
+            lst.push_front(std::move(evaluate(tokens)));
+            ++counter;
+            front = tokens.front();
+        }
+        if (counter >= 10) {
+            std::cout << "Broke out from counter!\n";
+        }
+        return createList(ObjectPtr(new Empty), lst);
     }
     else if (token[0] == ')') {
         return ObjectPtr(new Empty);
