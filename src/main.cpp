@@ -14,6 +14,7 @@
 #include "symbol.h"
 #include "empty.h"
 
+//\! Converts container of iterables to std::list.
 template <class CONT>
 std::list<typename CONT::value_type> toList(const CONT& container)
 {
@@ -23,6 +24,7 @@ std::list<typename CONT::value_type> toList(const CONT& container)
     return ret;
 }
 
+//\! Recursively moves objects from std::list<> into a linked list of pairs.
 ObjectPtr createList(ObjectPtr curr, std::list<ObjectPtr>& tokens)
 {
     if (tokens.empty()) {
@@ -35,19 +37,25 @@ ObjectPtr createList(ObjectPtr curr, std::list<ObjectPtr>& tokens)
     }
 }
 
+//\! evaluate a list of tokens into an object.
 ObjectPtr evaluate(std::list<Token>& tokens)
 {
-    // Base cases:
     // [LET (TOKEN = first token in tokens, C = first character of token)]
-    // tokens empty       -> Empty()
-    // C ~ [1-9]          -> Integer() [TODO: expand numerical types]
-    // C ~ "              -> String()
-    // C ~ #[tf]          -> Boolean()
-    // C ~ #\[a-zA-Z1-9]+ -> Character() [TODO: add unicode character class]
-    // anything else      -> Symbol()
-
+    //------------------------------------------------------------------------
+    // [Case]             | [Result]
+    //------------------------------------------------------------------------
+    // Base cases:    
+    //------------------------------------------------------------------------
+    // tokens empty       | Empty()
+    // C ~ [1-9]          | Integer() [TODO: expand numerical types]
+    // C ~ "              | String()
+    // C ~ #[tf]          | Boolean()
+    // C ~ #\[a-zA-Z1-9]+ | Character() [TODO: add unicode character class]
+    // anything else      | Symbol()
+    //------------------------------------------------------------------------
     // Recursive cases:
-    // C ~ (              -> List()
+    //------------------------------------------------------------------------
+    // C ~ (              | List()
     
     if (tokens.empty()) {
         return ObjectPtr(new Empty);
@@ -86,6 +94,7 @@ ObjectPtr evaluate(std::list<Token>& tokens)
     }    
 }
 
+//\! Take a string read in and evaluate it.
 ObjectPtr process(const char* str)
 {
     std::cout << "> " << str << std::endl;
