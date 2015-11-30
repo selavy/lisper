@@ -5,6 +5,7 @@
 #include <deque>
 #include <vector>
 #include <list>
+#include <cstring>
 #include "tokenize.h"
 #include "number.h"
 #include "integer.h"
@@ -85,6 +86,7 @@ ObjectPtr evaluate(std::list<Token>& tokens)
         return ObjectPtr(new Empty);
     }
     else {
+        //TODO: look up symbol in environment
         return ObjectPtr(new Symbol(token.c_str()));
     }    
 }
@@ -101,25 +103,39 @@ ObjectPtr process(const char* str)
 
 int main(int argc, char** argv)
 {
-    std::vector<std::string> cases = {
-        "\"Hello\"",
-        "1",
-        "100",
-        "10000",
-        "#t",
-        "#f",
-        "(+ 1 2)",
-        "(+ (+ 1 2) 2)"
-    };
-
-    for (const auto& c : cases)
-    {
-        ObjectPtr res = std::move(process(c.c_str()));
+    if (argc > 1 && (strcmp(argv[1], "--live") == 0)) {
+        std::cout << ">";
+        auto tokens = toList(tokenize(std::cin));
+        auto res = evaluate(tokens);
         if (res) {
-            std::cout << "  " << *res << std::endl;
+            std::cout << *res << std::endl;
         }
         else {
-            std::cout << "(null)" << std::endl;
+            std::cout << std::endl;
+        }
+    }
+    else {
+        std::vector<std::string> cases = {
+            "\"Hello\"",
+            "1",
+            "100",
+            "10000",
+            "#t",
+            "#f",
+            "(+ 1 2)",
+            "(+ (+ 1 2) 2)",
+            "(writeln \"hello world\n\")"
+        };
+
+        for (const auto& c : cases)
+        {
+            ObjectPtr res = std::move(process(c.c_str()));
+            if (res) {
+                std::cout << "  " << *res << std::endl;
+            }
+            else {
+                std::cout << "(null)" << std::endl;
+            }
         }
     }
     
