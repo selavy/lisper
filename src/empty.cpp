@@ -6,12 +6,12 @@ Empty::Empty()
     
 std::string Empty::toString() const
 {
-    return "";
+    return "()";
 }
 
 std::string Empty::typeToString() const
 {
-    return "";
+    return "Empty";
 }
 
 bool Empty::isBoolean() const

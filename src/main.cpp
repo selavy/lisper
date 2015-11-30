@@ -104,7 +104,8 @@ int main(int argc, char** argv)
         "10000",
         "#t",
         "#f",
-        "(+ 1 2)"
+        "(+ 1 2)",
+        "(+ (+ 1 2) 2)"
     };
 
     for (const auto& c : cases)
