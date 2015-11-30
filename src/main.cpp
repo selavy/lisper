@@ -75,14 +75,9 @@ ObjectPtr evaluate(std::list<Token>& tokens)
     else if (token[0] == '(') {
         Token front = tokens.front();
         std::list<ObjectPtr> lst;
-        int counter = 0;
-        while (front != ")" && counter < 10) {
+        while (front != ")") {
             lst.push_front(std::move(evaluate(tokens)));
-            ++counter;
             front = tokens.front();
-        }
-        if (counter >= 10) {
-            std::cout << "Broke out from counter!\n";
         }
         return createList(ObjectPtr(new Empty), lst);
     }
