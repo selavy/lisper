@@ -7,6 +7,7 @@
 #include <list>
 #include <cstring>
 #include <unordered_map>
+#include <functional>
 #include "tokenize.h"
 #include "number.h"
 #include "integer.h"
@@ -17,6 +18,8 @@
 #include "empty.h"
 
 typedef std::unordered_map<std::string, ObjectPtr> Environment;
+typedef std::function<ObjectPtr (ObjectPtr, Environment)> Primitive;
+typedef std::unordered_map<std::string, Primitive> Primitives;
 
 //\! Converts container of iterables to std::list.
 template <class CONT>
@@ -89,8 +92,6 @@ ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
         return ObjectPtr(new Empty);
     }
     else {
-        //TODO: look up symbol in environment
-        // return ObjectPtr(new Symbol(token.c_str()));
         auto found = env.find(token);
         if (found == std::end(env)) {
             throw std::runtime_error("Invalid symbol: '" + token + "'");
@@ -109,12 +110,18 @@ ObjectPtr process(const char* str, Environment& env)
     return evaluate(tokens, env);
 }
 
+void initializeEnvironment(Environment& env)
+{
+    env.emplace("+", ObjectPtr(new Symbol("+")));
+}
+
 int main(int argc, char** argv)
 {
     if (argc > 1 && (strcmp(argv[1], "--live") == 0)) {
         std::cout << ">";
         auto tokens = toList(tokenize(std::cin));
         Environment env;
+        initializeEnvironment(env);
         try {
             auto res = evaluate(tokens, env);
             if (res) {
@@ -137,14 +144,14 @@ int main(int argc, char** argv)
             "#t",
             "#f",
             "(+ 1 2)",
-            "(+ (+ 1 2) 2)",
-            "(writeln \"hello world\n\")"
+            "(+ (+ 1 2) 2)"
         };
 
         for (const auto& c : cases)
         {
             try {
                 Environment env;
+                initializeEnvironment(env);                
                 ObjectPtr res = std::move(process(c.c_str(), env));
                 if (res) {
                     std::cout << "  " << *res << std::endl;
