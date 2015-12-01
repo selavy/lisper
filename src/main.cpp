@@ -90,7 +90,12 @@ ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
     }
     else {
         //TODO: look up symbol in environment
-        return ObjectPtr(new Symbol(token.c_str()));
+        // return ObjectPtr(new Symbol(token.c_str()));
+        auto found = env.find(token);
+        if (found == std::end(env)) {
+            throw std::runtime_error("Invalid symbol: '" + token + "'");
+        }
+        return found->second;
     }    
 }
 
@@ -110,12 +115,17 @@ int main(int argc, char** argv)
         std::cout << ">";
         auto tokens = toList(tokenize(std::cin));
         Environment env;
-        auto res = evaluate(tokens, env);
-        if (res) {
-            std::cout << *res << std::endl;
+        try {
+            auto res = evaluate(tokens, env);
+            if (res) {
+                std::cout << *res << std::endl;
+            }
+            else {
+                std::cout << std::endl;
+            }
         }
-        else {
-            std::cout << std::endl;
+        catch (std::runtime_error& ex) {
+            std::cout << "Exception: " << ex.what() << "\n";
         }
     }
     else {
@@ -133,13 +143,18 @@ int main(int argc, char** argv)
 
         for (const auto& c : cases)
         {
-            Environment env;
-            ObjectPtr res = std::move(process(c.c_str(), env));
-            if (res) {
-                std::cout << "  " << *res << std::endl;
+            try {
+                Environment env;
+                ObjectPtr res = std::move(process(c.c_str(), env));
+                if (res) {
+                    std::cout << "  " << *res << std::endl;
+                }
+                else {
+                    std::cout << "(null)" << std::endl;
+                }
             }
-            else {
-                std::cout << "(null)" << std::endl;
+            catch (std::runtime_error& ex) {
+                std::cout << "Exception: " << ex.what() << "\n";                
             }
         }
     }
