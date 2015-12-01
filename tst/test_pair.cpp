@@ -28,7 +28,7 @@ void TestPair::t_TwoIntegers()
     ObjectPtr a(new Integer("100"));
     ObjectPtr b(new Integer("200"));
 
-    Pair p(a.release(), b.release());
+    Pair p(a, b);
 
     CPPUNIT_ASSERT(p.first()->isNumber());
     CPPUNIT_ASSERT(p.second()->isNumber());
@@ -55,7 +55,7 @@ void TestPair::t_ListFromPairs()
     ObjectPtr b(new Integer("200"));
     ObjectPtr c(new Integer("300"));
 
-    ObjectPtr tail(new Pair(c.release(), nullptr));
+    ObjectPtr tail(new Pair(c, nullptr));
     ObjectPtr myPair = CONS(a, CONS(b, tail));
 
     Pair const* curr = dynamic_cast<Pair const*>(myPair.get());

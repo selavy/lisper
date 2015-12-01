@@ -1,7 +1,7 @@
 #include "pair.h"
 #include <sstream>
 
-Pair::Pair(Object* first, Object* second)
+Pair::Pair(ObjectPtr first, ObjectPtr second)
     : first_(first)
     , second_(second)
 {
@@ -93,7 +93,7 @@ bool Pair::isProcedure() const
 
 ObjectPtr cons(ObjectPtr first, ObjectPtr second)
 {
-    return ObjectPtr(new Pair(first.release(), second.release()));
+    return ObjectPtr(new Pair(first, second));
 }
 
     

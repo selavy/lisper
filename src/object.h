@@ -35,6 +35,6 @@ struct Object
 
 std::ostream& operator<<(std::ostream& os, const Object& obj);
 
-typedef std::unique_ptr<Object> ObjectPtr;
+typedef std::shared_ptr<Object> ObjectPtr;
 
 #endif // OBJECT__H_

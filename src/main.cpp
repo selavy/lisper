@@ -6,6 +6,7 @@
 #include <vector>
 #include <list>
 #include <cstring>
+#include <unordered_map>
 #include "tokenize.h"
 #include "number.h"
 #include "integer.h"
@@ -14,6 +15,8 @@
 #include "pair.h"
 #include "symbol.h"
 #include "empty.h"
+
+typedef std::unordered_map<std::string, ObjectPtr> Environment;
 
 //\! Converts container of iterables to std::list.
 template <class CONT>
@@ -32,14 +35,14 @@ ObjectPtr createList(ObjectPtr curr, std::list<ObjectPtr>& tokens)
         return curr;
     }
     else {
-        Object* front = tokens.front().release();
+        ObjectPtr front = tokens.front();
         tokens.pop_front();
-        return createList(std::move(ObjectPtr(new Pair(front, curr.release()))), tokens);
+        return createList(std::move(ObjectPtr(new Pair(front, curr))), tokens);
     }
 }
 
 //\! evaluate a list of tokens into an object.
-ObjectPtr evaluate(std::list<Token>& tokens)
+ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
 {
     // [LET (TOKEN = first token in tokens, C = first character of token)]
     //------------------------------------------------------------------------
@@ -77,7 +80,7 @@ ObjectPtr evaluate(std::list<Token>& tokens)
         Token front = tokens.front();
         std::list<ObjectPtr> lst;
         while (front != ")") {
-            lst.push_front(std::move(evaluate(tokens)));
+            lst.push_front(std::move(evaluate(tokens, env)));
             front = tokens.front();
         }
         return createList(ObjectPtr(new Empty), lst);
@@ -92,13 +95,13 @@ ObjectPtr evaluate(std::list<Token>& tokens)
 }
 
 //\! Take a string read in and evaluate it.
-ObjectPtr process(const char* str)
+ObjectPtr process(const char* str, Environment& env)
 {
     std::cout << "> " << str << std::endl;
     std::stringstream ss;
     ss << str;
     std::list<Token> tokens = toList(tokenize(ss));
-    return evaluate(tokens);
+    return evaluate(tokens, env);
 }
 
 int main(int argc, char** argv)
@@ -106,7 +109,8 @@ int main(int argc, char** argv)
     if (argc > 1 && (strcmp(argv[1], "--live") == 0)) {
         std::cout << ">";
         auto tokens = toList(tokenize(std::cin));
-        auto res = evaluate(tokens);
+        Environment env;
+        auto res = evaluate(tokens, env);
         if (res) {
             std::cout << *res << std::endl;
         }
@@ -129,7 +133,8 @@ int main(int argc, char** argv)
 
         for (const auto& c : cases)
         {
-            ObjectPtr res = std::move(process(c.c_str()));
+            Environment env;
+            ObjectPtr res = std::move(process(c.c_str(), env));
             if (res) {
                 std::cout << "  " << *res << std::endl;
             }

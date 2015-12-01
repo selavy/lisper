@@ -6,7 +6,7 @@
 class Pair : public Object
 {
 public:
-    Pair(Object* first=0, Object* second=0);
+    Pair(ObjectPtr first=ObjectPtr(), ObjectPtr second=ObjectPtr());
 
     const ObjectPtr& first() const;
 
