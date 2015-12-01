@@ -72,5 +72,23 @@ void TestPair::t_ListFromPairs()
     // std::cout << ss.str() << std::endl;
 }
 
+void TestPair::t_Length()
+{
+    ObjectPtr a(new Integer("100"));
+    ObjectPtr b(new Integer("200"));
+    ObjectPtr c(new Integer("300"));
+
+    ObjectPtr tail(new Pair(c, nullptr));
+    ObjectPtr pair = CONS(a, CONS(b, tail));
+
+    CPPUNIT_ASSERT_EQUAL(3UL, length(pair));
+}
+
+void TestPair::t_LengthReturnsZeroForEmptyList()
+{
+    ObjectPtr pair(new Pair);
+    CPPUNIT_ASSERT_EQUAL(0UL, length(pair));
+}
+
 CPPUNIT_TEST_SUITE_REGISTRATION(TestPair);
 

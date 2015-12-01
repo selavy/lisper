@@ -43,6 +43,8 @@ private:
 
 ObjectPtr cons(ObjectPtr first, ObjectPtr second);
 
+std::size_t length(ObjectPtr pair);
+
 #define CONS(f, s) cons(std::move(f), std::move(s))
 
 #define CAR(p) p->first()

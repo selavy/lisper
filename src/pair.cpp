@@ -96,4 +96,17 @@ ObjectPtr cons(ObjectPtr first, ObjectPtr second)
     return ObjectPtr(new Pair(first, second));
 }
 
+std::size_t length(ObjectPtr pair)
+{
+    if (Pair* head = dynamic_cast<Pair*>(pair.get())) {
+        if (CAR(head) == nullptr) return 0;
+        std::size_t ret = 1;
+        while ((head = dynamic_cast<Pair*>(CDR(head).get()))) ++ret;
+        return ret;
+    }
+    else {
+        throw std::runtime_error("Object is not a pair!");
+    }
+}
+
     

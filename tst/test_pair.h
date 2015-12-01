@@ -17,12 +17,16 @@ public:
     void t_TwoIntegers();
     void t_Cons();
     void t_ListFromPairs();
+    void t_Length();
+    void t_LengthReturnsZeroForEmptyList();
 
     CPPUNIT_TEST_SUITE(TestPair);
     CPPUNIT_TEST(t_EmptyTest);
     CPPUNIT_TEST(t_TwoIntegers);
     CPPUNIT_TEST(t_Cons);
     CPPUNIT_TEST(t_ListFromPairs);
+    CPPUNIT_TEST(t_Length);
+    CPPUNIT_TEST(t_LengthReturnsZeroForEmptyList);
     CPPUNIT_TEST_SUITE_END();
     
 };
