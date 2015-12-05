@@ -126,6 +126,7 @@ void initializeEnvironment(Environment& env)
     env.emplace("+", ObjectPtr(new Symbol("+")));
     env.emplace("-", ObjectPtr(new Symbol("-")));
     env.emplace("*", ObjectPtr(new Symbol("*")));
+    env.emplace("/", ObjectPtr(new Symbol("/")));
 
     gPrimitives.emplace("+", ObjectPtr(new Primitive("+", [](Arguments& args)
                     {
@@ -168,6 +169,28 @@ void initializeEnvironment(Environment& env)
                         }
                         return ObjectPtr(new Integer(ret));
                     })));
+
+    gPrimitives.emplace("/", ObjectPtr(new Primitive("/", [](Arguments& args)
+                    {
+                        Integer::value_type ret = 1;
+                        if (args.empty()) {
+                            ret = 1;
+                        }
+                        else if (args.size() == 1) {
+                            ObjectPtr elem = args.front();
+                            Integer::value_type val = toInteger(elem)->value();
+                            //TODO(plesslie): exception for divide by zero?
+                            ret = 1 / val;
+                        }
+                        else {
+                            ret = toInteger(args.front())->value();
+                            args.pop_front();
+                            for (const auto& arg: args) {
+                                ret /= toInteger(arg)->value();
+                            }
+                        }
+                        return ObjectPtr(new Integer(ret));
+                    })));
 }
 
 int main(int argc, char** argv)
@@ -206,7 +229,10 @@ int main(int argc, char** argv)
             "(- (+ 1 2) 3)",
             "(* 1 2 3 4 5 0)",
             "(* (+ 1 2) (+ 3 4))",
-            "(*)"
+            "(*)",
+            "(/)",
+            "(/ 2)",
+            "(/ 8 4)"
         };
 
         for (const auto& c : cases)
