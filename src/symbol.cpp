@@ -59,3 +59,9 @@ bool Symbol::isProcedure() const
 {
     return false;
 }
+
+std::string Symbol::name() const
+{
+    return symbol_;
+}
+

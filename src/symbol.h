@@ -31,6 +31,8 @@ public:
 
     virtual bool isProcedure() const override;
 
+    std::string name() const;
+
 private:
     std::string symbol_;
 };

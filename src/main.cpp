@@ -31,16 +31,32 @@ std::list<typename CONT::value_type> toList(const CONT& container)
     return ret;
 }
 
-//\! Recursively moves objects from std::list<> into a linked list of pairs.
-ObjectPtr createList(ObjectPtr curr, std::list<ObjectPtr>& tokens)
+ObjectPtr evaluateList(std::list<ObjectPtr>& tokens, Environment& env)
 {
-    if (tokens.empty()) {
-        return curr;
+    ObjectPtr head = tokens.front();
+    tokens.pop_front();
+
+    //TODO(plesslie): Procedure inherit from Symbol?
+    Symbol* symbol = dynamic_cast<Symbol*>(head.get());
+    if (!symbol) {
+        throw std::runtime_error("Invalid token (not symbol): " + head->toString());
+    }
+
+    if (symbol->name() == "+") {
+        //TEMP(plesslie): change this to a Number() and overload + operator
+        //that way can handle more than integers
+        Integer::value_type ret = 0;
+        for (const auto& elem: tokens) {
+           const Integer* i = dynamic_cast<Integer const*>(elem.get());
+           if (!i) {
+               throw std::runtime_error("Argument type invalid for operator+: " + elem->toString());
+           }
+           ret += i->value();
+        }
+        return ObjectPtr(new Integer(ret));
     }
     else {
-        ObjectPtr front = tokens.front();
-        tokens.pop_front();
-        return createList(std::move(ObjectPtr(new Pair(front, curr))), tokens);
+        throw std::runtime_error("CAR of list is not an operator: " + head->toString());
     }
 }
 
@@ -68,8 +84,10 @@ ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
         return ObjectPtr(new Empty);
     }
 
+
     Token token = tokens.front();
     tokens.pop_front();
+
     if (std::isdigit(token[0])) {
         return ObjectPtr(new Integer(token.c_str()));
     }
@@ -83,13 +101,15 @@ ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
         Token front = tokens.front();
         std::list<ObjectPtr> lst;
         while (front != ")") {
-            lst.push_front(std::move(evaluate(tokens, env)));
+            lst.push_back(std::move(evaluate(tokens, env)));
             front = tokens.front();
         }
-        return createList(ObjectPtr(new Empty), lst);
+        
+        tokens.pop_front(); // remove final ')' character
+        return evaluateList(lst, env);
     }
     else if (token[0] == ')') {
-        return ObjectPtr(new Empty);
+        throw std::runtime_error("Unmatched closing paren!");
     }
     else {
         auto found = env.find(token);
@@ -144,7 +164,9 @@ int main(int argc, char** argv)
             "#t",
             "#f",
             "(+ 1 2)",
-            "(+ (+ 1 2) 2)"
+            "(+ (+ 1 2) 4)",
+            "(+ (+ 1 2) (+ 3 4) (+ 1 2 3 4 5 6))"
+
         };
 
         for (const auto& c : cases)
