@@ -27,4 +27,6 @@ private:
     value_type val_;
 };
 
+Integer* toInteger(const ObjectPtr& p);
+
 #endif // INTEGER__H_

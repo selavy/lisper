@@ -122,16 +122,16 @@ ObjectPtr process(const char* str, Environment& env)
 
 void initializeEnvironment(Environment& env)
 {
+    //TODO(plesslie): remove these from symbol map and add case to evaluate()
     env.emplace("+", ObjectPtr(new Symbol("+")));
     env.emplace("-", ObjectPtr(new Symbol("-")));
+    env.emplace("*", ObjectPtr(new Symbol("*")));
 
     gPrimitives.emplace("+", ObjectPtr(new Primitive("+", [](Arguments& args)
                     {
                         Integer::value_type ret = 0;
-                        for (const auto& elem: args) {
-                           const Integer* i = dynamic_cast<Integer const*>(elem.get());
-                           if (!i) throw std::runtime_error("Argument type invalid for operator+: " + elem->toString());
-                           ret += i->value();
+                        for (const auto& arg: args) {
+                            ret += toInteger(arg)->value();
                         }
                         return ObjectPtr(new Integer(ret));
                     })));
@@ -139,33 +139,33 @@ void initializeEnvironment(Environment& env)
     gPrimitives.emplace("-", ObjectPtr(new Primitive("-", [](Arguments& args)
                     {
                         Integer::value_type ret = 0;
-
                         if (args.empty()) {
                             ret = 0;
                         }
                         else if (args.size() == 1) {
                             ObjectPtr elem = args.front();
                             args.pop_front();
-                            const Integer* i = dynamic_cast<Integer const*>(elem.get());
-                            if (!i) throw std::runtime_error("Argument type invalid for operator-:" + elem->toString());
-                            ret -= i->value();
+                            ret -= toInteger(elem)->value();
                         }
                         else {
                             // initialize with first element, subtract rest from that
-                            ObjectPtr car = args.front();
-                            const Integer* cari = dynamic_cast<Integer const*>(car.get());
-                            if (!cari) throw std::runtime_error("Argument type invalid for operator-: " + car->toString());
-                            ret = cari->value();
+                            ret = toInteger(args.front())->value();
 
                             // pop front and process cdr
                             args.pop_front();
                             for (const auto& elem: args) {
-                                const Integer* i = dynamic_cast<Integer const*>(elem.get());
-                                if (!i) throw std::runtime_error("Argument type invalid for operator-: " + elem->toString());
-                                ret -= i->value();
+                                ret -= toInteger(elem)->value();
                             }
                         }
-                        
+                        return ObjectPtr(new Integer(ret));
+                    })));
+
+    gPrimitives.emplace("*", ObjectPtr(new Primitive("*", [](Arguments& args)
+                    {
+                        Integer::value_type ret = 1;
+                        for (const auto& arg: args) {
+                            ret *= toInteger(arg)->value();
+                        }
                         return ObjectPtr(new Integer(ret));
                     })));
 }
@@ -201,8 +201,12 @@ int main(int argc, char** argv)
             "(+ 1 2)",
             "(+ (+ 1 2) 4)",
             "(+ (+ 1 2) (+ 3 4) (+ 1 2 3 4 5 6))",
-            "(- (+ 1 2) 3)"
-
+            "(+)",
+            "(-)",
+            "(- (+ 1 2) 3)",
+            "(* 1 2 3 4 5 0)",
+            "(* (+ 1 2) (+ 3 4))",
+            "(*)"
         };
 
         for (const auto& c : cases)
