@@ -46,57 +46,7 @@ ObjectPtr evaluateList(std::list<ObjectPtr>& tokens, Environment& env)
         return primPtr->evaluate(tokens);
     }
     else {
-        //TODO(plesslie): Procedure class with Object* evaluate(std::list<ObjectPtr> args), register
-        //                in an unordered_map<std::string, Procedure>
-        Symbol* symbol = dynamic_cast<Symbol*>(head.get());
-        if (!symbol) {
-            throw std::runtime_error("Invalid token (not symbol): " + head->toString());
-        }
-        if (symbol->name() == "+") { // unboxed version
-            //TEMP(plesslie): change this to a Number() and overload + operator
-            //that way can handle more than integers
-            Integer::value_type ret = 0;
-            for (const auto& elem: tokens) {
-               const Integer* i = dynamic_cast<Integer const*>(elem.get());
-               if (!i) throw std::runtime_error("Argument type invalid for operator+: " + elem->toString());
-               ret += i->value();
-            }
-            return ObjectPtr(new Integer(ret));
-        }
-        else if (symbol->name() == "-") { // unboxed version
-            Integer::value_type ret = 0;
-
-            if (tokens.empty()) {
-                ret = 0;
-            }
-            else if (tokens.size() == 1) {
-                ObjectPtr elem = tokens.front();
-                tokens.pop_front();
-                const Integer* i = dynamic_cast<Integer const*>(elem.get());
-                if (!i) throw std::runtime_error("Argument type invalid for operator-:" + elem->toString());
-                ret -= i->value();
-            }
-            else {
-                // initialize with first element, subtract rest from that
-                ObjectPtr car = tokens.front();
-                const Integer* cari = dynamic_cast<Integer const*>(car.get());
-                if (!cari) throw std::runtime_error("Argument type invalid for operator-: " + car->toString());
-                ret = cari->value();
-
-                // pop front and process cdr
-                tokens.pop_front();
-                for (const auto& elem: tokens) {
-                    const Integer* i = dynamic_cast<Integer const*>(elem.get());
-                    if (!i) throw std::runtime_error("Argument type invalid for operator-: " + elem->toString());
-                    ret -= i->value();
-                }
-            }
-            
-            return ObjectPtr(new Integer(ret));
-        }
-        else {
-            throw std::runtime_error("CAR of list is not an operator: " + head->toString());
-        }
+        throw std::runtime_error("Not a valid primitive: " + head->toString());
     }
 }
 
@@ -175,7 +125,7 @@ void initializeEnvironment(Environment& env)
     env.emplace("+", ObjectPtr(new Symbol("+")));
     env.emplace("-", ObjectPtr(new Symbol("-")));
 
-    gPrimitives.emplace("+", ObjectPtr(new Primitive("+", [](std::list<ObjectPtr>& args)
+    gPrimitives.emplace("+", ObjectPtr(new Primitive("+", [](Arguments& args)
                     {
                         Integer::value_type ret = 0;
                         for (const auto& elem: args) {
@@ -186,7 +136,38 @@ void initializeEnvironment(Environment& env)
                         return ObjectPtr(new Integer(ret));
                     })));
 
-//    gPrimitives.emplace("-", ObjectPtr())
+    gPrimitives.emplace("-", ObjectPtr(new Primitive("-", [](Arguments& args)
+                    {
+                        Integer::value_type ret = 0;
+
+                        if (args.empty()) {
+                            ret = 0;
+                        }
+                        else if (args.size() == 1) {
+                            ObjectPtr elem = args.front();
+                            args.pop_front();
+                            const Integer* i = dynamic_cast<Integer const*>(elem.get());
+                            if (!i) throw std::runtime_error("Argument type invalid for operator-:" + elem->toString());
+                            ret -= i->value();
+                        }
+                        else {
+                            // initialize with first element, subtract rest from that
+                            ObjectPtr car = args.front();
+                            const Integer* cari = dynamic_cast<Integer const*>(car.get());
+                            if (!cari) throw std::runtime_error("Argument type invalid for operator-: " + car->toString());
+                            ret = cari->value();
+
+                            // pop front and process cdr
+                            args.pop_front();
+                            for (const auto& elem: args) {
+                                const Integer* i = dynamic_cast<Integer const*>(elem.get());
+                                if (!i) throw std::runtime_error("Argument type invalid for operator-: " + elem->toString());
+                                ret -= i->value();
+                            }
+                        }
+                        
+                        return ObjectPtr(new Integer(ret));
+                    })));
 }
 
 int main(int argc, char** argv)

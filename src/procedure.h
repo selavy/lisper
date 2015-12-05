@@ -4,10 +4,12 @@
 #include "object.h"
 #include <list>
 
+typedef std::list<ObjectPtr> Arguments;
+
 class Procedure : public Object
 {
 public:
-    virtual ObjectPtr evaluate(std::list<ObjectPtr>& args)=0;
+    virtual ObjectPtr evaluate(Arguments& args)=0;
 
     virtual std::string typeToString() const override;
 

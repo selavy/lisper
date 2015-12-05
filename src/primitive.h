@@ -8,12 +8,12 @@
 class Primitive : public Procedure
 {
 public:
-    typedef ObjectPtr (*FuncDef)(std::list<ObjectPtr>&);
+    typedef ObjectPtr (*FuncDef)(Arguments&);
 
 public:
     Primitive(const char* name, FuncDef&& def);
 
-    virtual ObjectPtr evaluate(std::list<ObjectPtr>& args) override;
+    virtual ObjectPtr evaluate(Arguments& args) override;
 
     virtual std::string typeToString() const override;
 
