@@ -11,19 +11,19 @@ public:
 
     virtual std::string typeToString() const override;
 
-    virtual bool isBoolean() const=0;
+    virtual bool isBoolean() const override;
 
-    virtual bool isSymbol() const=0;
+    virtual bool isSymbol() const override;
 
-    virtual bool isChar() const=0;
+    virtual bool isChar() const override;
 
-    virtual bool isVector() const=0;
+    virtual bool isVector() const override;
 
-    virtual bool isPair() const=0;
+    virtual bool isPair() const override;
 
-    virtual bool isNumber() const=0;
+    virtual bool isNumber() const override;
 
-    virtual bool isString() const=0;
+    virtual bool isString() const override;
 
     virtual bool isProcedure() const override;
 };
