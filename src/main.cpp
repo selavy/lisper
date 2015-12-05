@@ -36,8 +36,6 @@ ObjectPtr evaluateList(std::list<ObjectPtr>& tokens, Environment& env)
     ObjectPtr head = tokens.front();
     tokens.pop_front();
 
-    //TODO(plesslie): Procedure inherit from Symbol?
-    //
     //TODO(plesslie): Procedure class with Object* evaluate(std::list<ObjectPtr> args), register
     //                in an unordered_map<std::string, Procedure>
     Symbol* symbol = dynamic_cast<Symbol*>(head.get());

@@ -11,6 +11,8 @@ add_executable(
   str.cpp
   symbol.cpp
   empty.cpp
+  procedure.cpp
+  primitive.cpp
   main.cpp
   )
 
