@@ -38,4 +38,6 @@ private:
     std::string str_;
 };
 
+String* toString(const ObjectPtr& p);
+
 #endif // STR__H_

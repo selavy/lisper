@@ -127,6 +127,7 @@ void initializeEnvironment(Environment& env)
     env.emplace("-", ObjectPtr(new Symbol("-")));
     env.emplace("*", ObjectPtr(new Symbol("*")));
     env.emplace("/", ObjectPtr(new Symbol("/")));
+    env.emplace("write", ObjectPtr(new Symbol("write")));
 
     gPrimitives.emplace("+", ObjectPtr(new Primitive("+", [](Arguments& args)
                     {
@@ -191,6 +192,22 @@ void initializeEnvironment(Environment& env)
                         }
                         return ObjectPtr(new Integer(ret));
                     })));
+
+    gPrimitives.emplace("write", ObjectPtr(new Primitive("write", [](Arguments& args)
+                    {
+                        if (args.empty()) {
+                            throw std::runtime_error("Expected 1 argument, none given");
+                        }
+                        else if (args.size() == 1) {
+                        //FIXME(plesslie): won't print control character (e.g. '\n') correctly
+                            std::cout << args.front()->toString() << std::endl;
+                        }
+                        else {
+                            throw std::runtime_error("Expected 1 argument, given: "
+                                    + std::to_string(args.size()));
+                        }
+                        return ObjectPtr(0);
+                    })));
 }
 
 int main(int argc, char** argv)
@@ -232,6 +249,7 @@ int main(int argc, char** argv)
             "(*)",
             "(/)",
             "(/ 2)",
+            "(write \"hello world!\")",
             "(/ 8 4)"
         };
 
@@ -243,9 +261,6 @@ int main(int argc, char** argv)
                 ObjectPtr res = std::move(process(c.c_str(), env));
                 if (res) {
                     std::cout << "  " << *res << std::endl;
-                }
-                else {
-                    std::cout << "(null)" << std::endl;
                 }
             }
             catch (std::runtime_error& ex) {
