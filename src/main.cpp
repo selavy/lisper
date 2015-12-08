@@ -117,21 +117,6 @@ ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
                 return createList(ObjectPtr(new Empty), objs);
             }
         }
-//        else if (token == "#") {
-//            token = tokens.front();
-//            POP(tokens);
-//            if (token != "(") {
-//                throw std::runtime_error("Invalid token: " + token);
-//            }
-//            ObjectPtr vec(new Vector);
-//            Token front = tokens.front();
-//            while (front != ")") {
-//                dynamic_cast<Vector*>(vec.get())->append(std::move(evaluate(tokens, env)));
-//                front = tokens.front();
-//            }
-//            POP(token); // remove final ')' character
-//            return vec;
-//        }
         else {
             throw std::runtime_error("Invalid token: " + token);
         }
