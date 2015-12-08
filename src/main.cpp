@@ -43,7 +43,7 @@ ObjectPtr createList(ObjectPtr curr, std::list<ObjectPtr>& objs)
     //TODO(plesslie): this is tail recursive, change to a while loop
     if (objs.empty()) return curr;
     ObjectPtr front = objs.front();
-    objs.pop_front();
+    POP(objs);
     return createList(std::move(ObjectPtr(new Pair(front, curr))), objs);
 }
 
@@ -51,7 +51,7 @@ ObjectPtr createList(ObjectPtr curr, std::list<ObjectPtr>& objs)
 ObjectPtr evaluateList(std::list<ObjectPtr>& tokens, Environment& env)
 {
     ObjectPtr head = tokens.front();
-    tokens.pop_front();
+    POP(tokens);
 
     const std::string& name = head->toString();
     auto found = gPrimitives.find(name);
@@ -90,7 +90,7 @@ ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
     }
 
     Token token = tokens.front();
-    tokens.pop_front();
+    POP(tokens);
 
     if (std::isdigit(token[0])) {
         return ObjectPtr(new Integer(token.c_str()));
@@ -100,10 +100,10 @@ ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
     }
     else if (token == "'") {
         token = tokens.front();
-        tokens.pop_front();
+        POP(tokens);
         if (token == "(") { // quoted list
             token = tokens.front();
-            tokens.pop_front();
+            POP(tokens);
             if (token == ")") {
                 return ObjectPtr(new Empty);
             }
@@ -113,13 +113,13 @@ ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
                     PUSH(objs, std::move(evaluate(tokens, env)));
                     token = tokens.front();
                 } 
-                tokens.pop_front(); // remove final ')'
+                POP(tokens); // remove final ')'
                 return createList(ObjectPtr(new Empty), objs);
             }
         }
 //        else if (token == "#") {
 //            token = tokens.front();
-//            tokens.pop_front();
+//            POP(tokens);
 //            if (token != "(") {
 //                throw std::runtime_error("Invalid token: " + token);
 //            }
@@ -129,7 +129,7 @@ ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
 //                dynamic_cast<Vector*>(vec.get())->append(std::move(evaluate(tokens, env)));
 //                front = tokens.front();
 //            }
-//            tokens.pop_front(); // remove final ')' character
+//            POP(token); // remove final ')' character
 //            return vec;
 //        }
         else {
@@ -141,7 +141,7 @@ ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
     }
     else if (token == "#" || token == "'#") {
         token = tokens.front();
-        tokens.pop_front();
+        POP(tokens);
         if (token == "(") { // vector
             ObjectPtr vec(new Vector);
             Token front = tokens.front();
@@ -149,7 +149,7 @@ ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
                 dynamic_cast<Vector*>(vec.get())->append(std::move(evaluate(tokens, env)));
                 front = tokens.front();
             }
-            tokens.pop_front(); // remove final ')' character
+            POP(tokens); // remove final ')' character
             return vec;
         }
         else {
@@ -164,7 +164,7 @@ ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
             PUSH(lst, std::move(evaluate(tokens, env)));
             front = tokens.front();
         }
-        tokens.pop_front(); // remove final ')' character
+        POP(tokens); // remove final ')' character
         return evaluateList(lst, env);
     }
     else if (token[0] == ')') {
@@ -218,7 +218,7 @@ void initializeEnvironment(Environment& env)
                 }
                 else if (args.size() == 1) {
                     ObjectPtr elem = args.front();
-                    args.pop_front();
+                    POP(args);
                     ret -= toInteger(elem)->value();
                 }
                 else {
@@ -226,7 +226,7 @@ void initializeEnvironment(Environment& env)
                     ret = toInteger(args.front())->value();
 
                     // pop front and process cdr
-                    args.pop_front();
+                    POP(args);
                     for (const auto& elem: args) {
                         ret -= toInteger(elem)->value();
                     }
@@ -259,7 +259,7 @@ void initializeEnvironment(Environment& env)
                 }
                 else {
                     ret = toInteger(args.front())->value();
-                    args.pop_front();
+                    POP(args);
                     for (const auto& arg: args) {
                         ret /= toInteger(arg)->value();
                     }
