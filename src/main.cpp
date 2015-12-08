@@ -74,7 +74,6 @@ ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
         return ObjectPtr(new Empty);
     }
 
-
     Token token = tokens.front();
     tokens.pop_front();
 
@@ -128,6 +127,7 @@ void initializeEnvironment(Environment& env)
     env.emplace("*", ObjectPtr(new Symbol("*")));
     env.emplace("/", ObjectPtr(new Symbol("/")));
     env.emplace("write", ObjectPtr(new Symbol("write")));
+    env.emplace("boolean?", ObjectPtr(new Symbol("boolean?")));
 
     gPrimitives.emplace("+", ObjectPtr(new Primitive("+", [](Arguments& args)
                     {
@@ -208,66 +208,57 @@ void initializeEnvironment(Environment& env)
                         }
                         return ObjectPtr(0);
                     })));
+
+    gPrimitives.emplace("boolean?", ObjectPtr(new Primitive("boolean?", [](Arguments& args)
+                    {
+                        if (args.empty() || args.size() != 1) {
+                            throw std::runtime_error("Expected 1 argument, given " + std::to_string(args.size()) + " arguments");
+                        }
+                        return ObjectPtr(new Boolean(args.front()->isBoolean()));
+                    })));
 }
 
 int main(int argc, char** argv)
 {
-    if (argc > 1 && (strcmp(argv[1], "--live") == 0)) {
-        std::cout << ">";
-        auto tokens = toList(tokenize(std::cin));
-        Environment env;
-        initializeEnvironment(env);
+    std::vector<std::string> cases = {
+        "\"Hello\"",
+        "1",
+        "100",
+        "10000",
+        "#t",
+        "#f",
+        "(+ 1 2)",
+        "(+ (+ 1 2) 4)",
+        "(+ (+ 1 2) (+ 3 4) (+ 1 2 3 4 5 6))",
+        "(+)",
+        "(-)",
+        "(- (+ 1 2) 3)",
+        "(* 1 2 3 4 5 0)",
+        "(* (+ 1 2) (+ 3 4))",
+        "(*)",
+        "(/)",
+        "(/ 2)",
+        "(write \"hello world!\")",
+        "(/ 8 4)",
+        "(boolean? #t)",
+        "(boolean? #f)",
+        "(boolean? \"hello\")"
+    };
+
+    for (const auto& c : cases)
+    {
         try {
-            auto res = evaluate(tokens, env);
+            Environment env;
+            initializeEnvironment(env);                
+            ObjectPtr res = std::move(process(c.c_str(), env));
             if (res) {
-                std::cout << *res << std::endl;
-            }
-            else {
-                std::cout << std::endl;
+                std::cout << "  " << *res << std::endl;
             }
         }
         catch (std::runtime_error& ex) {
-            std::cout << "Exception: " << ex.what() << "\n";
+            std::cout << "Exception: " << ex.what() << "\n";                
         }
     }
-    else {
-        std::vector<std::string> cases = {
-            "\"Hello\"",
-            "1",
-            "100",
-            "10000",
-            "#t",
-            "#f",
-            "(+ 1 2)",
-            "(+ (+ 1 2) 4)",
-            "(+ (+ 1 2) (+ 3 4) (+ 1 2 3 4 5 6))",
-            "(+)",
-            "(-)",
-            "(- (+ 1 2) 3)",
-            "(* 1 2 3 4 5 0)",
-            "(* (+ 1 2) (+ 3 4))",
-            "(*)",
-            "(/)",
-            "(/ 2)",
-            "(write \"hello world!\")",
-            "(/ 8 4)"
-        };
 
-        for (const auto& c : cases)
-        {
-            try {
-                Environment env;
-                initializeEnvironment(env);                
-                ObjectPtr res = std::move(process(c.c_str(), env));
-                if (res) {
-                    std::cout << "  " << *res << std::endl;
-                }
-            }
-            catch (std::runtime_error& ex) {
-                std::cout << "Exception: " << ex.what() << "\n";                
-            }
-        }
-    }
-    
     return 0;
 }

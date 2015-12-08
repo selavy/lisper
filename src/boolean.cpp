@@ -9,6 +9,11 @@ Boolean::Boolean()
 {
 }
 
+Boolean::Boolean(bool val)
+    : val_(val)
+{
+}
+
 Boolean::Boolean(const char* val)
     : val_(strncmp(val, FALSE_STR, strlen(FALSE_STR)) != 0)
 {

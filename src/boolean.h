@@ -8,6 +8,8 @@ class Boolean : public Object
 {
 public:
     Boolean();
+
+    Boolean(bool val);
     
     Boolean(const char* val);
 
