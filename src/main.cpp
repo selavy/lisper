@@ -169,6 +169,13 @@ ObjectPtr process(const char* str, Environment& env)
     return evaluate(tokens, env);
 }
 
+template <class Func>
+void addPrimitive(Environment& env, const char* symbol, Func&& func)
+{
+    env.emplace(symbol, ObjectPtr(new Symbol(symbol)));
+    gPrimitives.emplace(symbol, ObjectPtr(new Primitive(symbol, std::forward<Func>(func))));
+}
+
 void initializeEnvironment(Environment& env)
 {
     //TODO(plesslie): remove these from symbol map and add case to evaluate()
@@ -334,21 +341,23 @@ void initializeEnvironment(Environment& env)
                         return ObjectPtr(new Boolean(args.front()->isString()));
                     })));
 
-    gPrimitives.emplace("procedure?", ObjectPtr(new Primitive("procedure?", [](Arguments& args)
-                    {
-                        if (args.empty() || args.size() != 1) {
-                            throw std::runtime_error("Expected 1 argument, given " + std::to_string(args.size()) + " arguments");
-                        }
-                        return ObjectPtr(new Boolean(args.front()->isProcedure()));
-                    })));
+    addPrimitive(env, "procedure?",
+            [](Arguments& args)
+            {
+                if (args.empty() || args.size() != 1) {
+                    throw std::runtime_error("Expected 1 argument, given " + std::to_string(args.size()) + " arguments");
+                }
+                return ObjectPtr(new Boolean(args.front()->isProcedure()));
+            });
 
-    gPrimitives.emplace("vector-length?", ObjectPtr(new Primitive("vector-length?", [](Arguments& args)
-                    {
-                        if (args.empty() || args.size() != 1) {
-                            throw std::runtime_error("Expected 1 argument, given " + std::to_string(args.size()) + " arguments");
-                        }
-                        return ObjectPtr(new Integer(toVector(args.front())->size()));
-                    })));
+    addPrimitive(env, "vector-length?",
+            [](Arguments& args)
+            {
+                if (args.empty() || args.size() != 1) {
+                    throw std::runtime_error("Expected 1 argument, given " + std::to_string(args.size()) + " arguments");
+                }
+                return ObjectPtr(new Integer(toVector(args.front())->size()));
+            });
 }
 
 int main(int argc, char** argv)
