@@ -33,6 +33,17 @@ std::list<typename CONT::value_type> toList(const CONT& container)
     return ret;
 }
 
+//\! Converts a std::list<> to a linked list of pairs (recursive)
+ObjectPtr createList(ObjectPtr curr, std::list<ObjectPtr>& objs)
+{
+    //TODO(plesslie): this is tail recursive, change to a while loop
+    if (objs.empty()) return curr;
+    ObjectPtr front = objs.front();
+    objs.pop_front();
+    return createList(std::move(ObjectPtr(new Pair(front, curr))), objs);
+}
+
+//\! Evaluates a std::list<> into a single ObjectPtr
 ObjectPtr evaluateList(std::list<ObjectPtr>& tokens, Environment& env)
 {
     ObjectPtr head = tokens.front();
@@ -83,6 +94,26 @@ ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
     else if (token[0] == '"') {
         return ObjectPtr(new String(token.c_str()));
     }
+    else if (token == "'") {
+        token = tokens.front();
+        tokens.pop_front();
+        if (token != "(") {
+            throw std::runtime_error("Invalid token: " + token);
+        }
+        token = tokens.front();
+        tokens.pop_front();
+        if (token == ")") {
+            return ObjectPtr(new Empty);
+        }
+        else {
+            std::list<ObjectPtr> objs;
+            while (token != ")") {
+                objs.push_back(std::move(evaluate(tokens, env)));
+                token = tokens.front();
+            } 
+            return createList(ObjectPtr(new Empty), objs);
+        }
+    }
     else if (Boolean::isBoolean(token.c_str())) {
         return ObjectPtr(new Boolean(token.c_str()));
     }
@@ -128,6 +159,15 @@ void initializeEnvironment(Environment& env)
     env.emplace("/", ObjectPtr(new Symbol("/")));
     env.emplace("write", ObjectPtr(new Symbol("write")));
     env.emplace("boolean?", ObjectPtr(new Symbol("boolean?")));
+    env.emplace("symbol?", ObjectPtr(new Symbol("symbol?")));
+    env.emplace("char?", ObjectPtr(new Symbol("char?")));
+    env.emplace("vector?", ObjectPtr(new Symbol("vector?")));
+    env.emplace("null?", ObjectPtr(new Symbol("null?")));
+    env.emplace("pair?", ObjectPtr(new Symbol("pair?")));
+    env.emplace("number?", ObjectPtr(new Symbol("number?")));
+    env.emplace("string?", ObjectPtr(new Symbol("string?")));
+    env.emplace("procedure?", ObjectPtr(new Symbol("procedure?")));
+
 
     gPrimitives.emplace("+", ObjectPtr(new Primitive("+", [](Arguments& args)
                     {
@@ -216,6 +256,71 @@ void initializeEnvironment(Environment& env)
                         }
                         return ObjectPtr(new Boolean(args.front()->isBoolean()));
                     })));
+
+    gPrimitives.emplace("symbol?", ObjectPtr(new Primitive("symbol?", [](Arguments& args)
+                    {
+                        if (args.empty() || args.size() != 1) {
+                            throw std::runtime_error("Expected 1 argument, given " + std::to_string(args.size()) + " arguments");
+                        }
+                        return ObjectPtr(new Boolean(args.front()->isSymbol()));
+                    })));
+
+    gPrimitives.emplace("char?", ObjectPtr(new Primitive("char?", [](Arguments& args)
+                    {
+                        if (args.empty() || args.size() != 1) {
+                            throw std::runtime_error("Expected 1 argument, given " + std::to_string(args.size()) + " arguments");
+                        }
+                        return ObjectPtr(new Boolean(args.front()->isChar()));
+                    })));
+
+    gPrimitives.emplace("vector?", ObjectPtr(new Primitive("vector?", [](Arguments& args)
+                    {
+                        if (args.empty() || args.size() != 1) {
+                            throw std::runtime_error("Expected 1 argument, given " + std::to_string(args.size()) + " arguments");
+                        }
+                        return ObjectPtr(new Boolean(args.front()->isVector()));
+                    })));
+
+    gPrimitives.emplace("null?", ObjectPtr(new Primitive("null?", [](Arguments& args)
+                    {
+                        if (args.empty() || args.size() != 1) {
+                            throw std::runtime_error("Expected 1 argument, given " + std::to_string(args.size()) + " arguments");
+                        }
+                        const bool res = dynamic_cast<Empty*>(args.front().get()) != 0;
+                        return ObjectPtr(new Boolean(res));
+                    })));
+
+    gPrimitives.emplace("pair?", ObjectPtr(new Primitive("pair?", [](Arguments& args)
+                    {
+                        if (args.empty() || args.size() != 1) {
+                            throw std::runtime_error("Expected 1 argument, given " + std::to_string(args.size()) + " arguments");
+                        }
+                        return ObjectPtr(new Boolean(args.front()->isPair()));
+                    })));
+
+    gPrimitives.emplace("number?", ObjectPtr(new Primitive("number?", [](Arguments& args)
+                    {
+                        if (args.empty() || args.size() != 1) {
+                            throw std::runtime_error("Expected 1 argument, given " + std::to_string(args.size()) + " arguments");
+                        }
+                        return ObjectPtr(new Boolean(args.front()->isNumber()));
+                    })));
+
+    gPrimitives.emplace("string?", ObjectPtr(new Primitive("string?", [](Arguments& args)
+                    {
+                        if (args.empty() || args.size() != 1) {
+                            throw std::runtime_error("Expected 1 argument, given " + std::to_string(args.size()) + " arguments");
+                        }
+                        return ObjectPtr(new Boolean(args.front()->isString()));
+                    })));
+
+    gPrimitives.emplace("procedure?", ObjectPtr(new Primitive("procedure?", [](Arguments& args)
+                    {
+                        if (args.empty() || args.size() != 1) {
+                            throw std::runtime_error("Expected 1 argument, given " + std::to_string(args.size()) + " arguments");
+                        }
+                        return ObjectPtr(new Boolean(args.front()->isProcedure()));
+                    })));
 }
 
 int main(int argc, char** argv)
@@ -242,7 +347,14 @@ int main(int argc, char** argv)
         "(/ 8 4)",
         "(boolean? #t)",
         "(boolean? #f)",
-        "(boolean? \"hello\")"
+        "(boolean? \"hello\")",
+        "(number? 1234)",
+        "(string? \"hello\")",
+        "(number? \"1234\")",
+        "'()",
+        "(null? '())",
+        "(pair? '(1 2))",
+        "(pair? '(1 2 3 4 5 6))"
     };
 
     for (const auto& c : cases)
