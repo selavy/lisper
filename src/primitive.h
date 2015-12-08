@@ -13,7 +13,7 @@ public:
 public:
     Primitive(const char* name, FuncDef&& def);
 
-    virtual ObjectPtr evaluate(Arguments& args) override;
+    virtual ObjectPtr evaluate(Arguments& args, Environment& env) override;
 
     virtual std::string typeToString() const override;
 

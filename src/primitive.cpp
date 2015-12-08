@@ -8,7 +8,7 @@ Primitive::Primitive(const char* name, FuncDef&& def)
     assert(def_);
 }
 
-ObjectPtr Primitive::evaluate(Arguments& args) 
+ObjectPtr Primitive::evaluate(Arguments& args, Environment& env) 
 {
     return def_(args);
 }

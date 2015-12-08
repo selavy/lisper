@@ -19,11 +19,11 @@
 #include "procedure.h"
 #include "primitive.h"
 #include "vec.h"
+#include "environment.h"
 
 #define POP(x) x.pop_front()
 #define PUSH(x, v) x.push_back(v)
 
-typedef std::unordered_map<std::string, ObjectPtr> Environment;
 typedef std::unordered_map<std::string, ObjectPtr> Primitives;
 static Primitives gPrimitives;
 
@@ -58,7 +58,7 @@ ObjectPtr evaluateList(std::list<ObjectPtr>& tokens, Environment& env)
     if (found != std::end(gPrimitives)) {
         ObjectPtr prim = found->second;
         Primitive* primPtr = dynamic_cast<Primitive*>(prim.get());
-        return primPtr->evaluate(tokens);
+        return primPtr->evaluate(tokens, env);
     }
     else {
         throw std::runtime_error("Not a valid primitive: " + head->toString());

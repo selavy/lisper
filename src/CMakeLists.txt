@@ -13,6 +13,7 @@ add_executable(
   empty.cpp
   procedure.cpp
   primitive.cpp
+  environment.cpp
   vec.cpp
   main.cpp
   )
