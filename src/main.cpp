@@ -179,102 +179,90 @@ void addPrimitive(Environment& env, const char* symbol, Func&& func)
 void initializeEnvironment(Environment& env)
 {
     //TODO(plesslie): remove these from symbol map and add case to evaluate()
-    env.emplace("+", ObjectPtr(new Symbol("+")));
-    env.emplace("-", ObjectPtr(new Symbol("-")));
-    env.emplace("*", ObjectPtr(new Symbol("*")));
-    env.emplace("/", ObjectPtr(new Symbol("/")));
-    env.emplace("write", ObjectPtr(new Symbol("write")));
-    env.emplace("boolean?", ObjectPtr(new Symbol("boolean?")));
-    env.emplace("symbol?", ObjectPtr(new Symbol("symbol?")));
-    env.emplace("char?", ObjectPtr(new Symbol("char?")));
-    env.emplace("vector?", ObjectPtr(new Symbol("vector?")));
-    env.emplace("null?", ObjectPtr(new Symbol("null?")));
-    env.emplace("pair?", ObjectPtr(new Symbol("pair?")));
-    env.emplace("number?", ObjectPtr(new Symbol("number?")));
-    env.emplace("string?", ObjectPtr(new Symbol("string?")));
-    env.emplace("procedure?", ObjectPtr(new Symbol("procedure?")));
-    env.emplace("vector-length?", ObjectPtr(new Symbol("vector-length?")));
+    addPrimitive(env, "+",
+            [](Arguments& args)
+            {
+                Integer::value_type ret = 0;
+                for (const auto& arg: args) {
+                    ret += toInteger(arg)->value();
+                }
+                return ObjectPtr(new Integer(ret));
+            });
 
+    addPrimitive(env, "-",
+            [](Arguments& args)
+            {
+                Integer::value_type ret = 0;
+                if (args.empty()) {
+                    ret = 0;
+                }
+                else if (args.size() == 1) {
+                    ObjectPtr elem = args.front();
+                    args.pop_front();
+                    ret -= toInteger(elem)->value();
+                }
+                else {
+                    // initialize with first element, subtract rest from that
+                    ret = toInteger(args.front())->value();
 
-    gPrimitives.emplace("+", ObjectPtr(new Primitive("+", [](Arguments& args)
-                    {
-                        Integer::value_type ret = 0;
-                        for (const auto& arg: args) {
-                            ret += toInteger(arg)->value();
-                        }
-                        return ObjectPtr(new Integer(ret));
-                    })));
+                    // pop front and process cdr
+                    args.pop_front();
+                    for (const auto& elem: args) {
+                        ret -= toInteger(elem)->value();
+                    }
+                }
+                return ObjectPtr(new Integer(ret));
+            });
 
-    gPrimitives.emplace("-", ObjectPtr(new Primitive("-", [](Arguments& args)
-                    {
-                        Integer::value_type ret = 0;
-                        if (args.empty()) {
-                            ret = 0;
-                        }
-                        else if (args.size() == 1) {
-                            ObjectPtr elem = args.front();
-                            args.pop_front();
-                            ret -= toInteger(elem)->value();
-                        }
-                        else {
-                            // initialize with first element, subtract rest from that
-                            ret = toInteger(args.front())->value();
+    addPrimitive(env, "*",
+            [](Arguments& args)
+            {
+                Integer::value_type ret = 1;
+                for (const auto& arg: args) {
+                    ret *= toInteger(arg)->value();
+                }
+                return ObjectPtr(new Integer(ret));
+            });
 
-                            // pop front and process cdr
-                            args.pop_front();
-                            for (const auto& elem: args) {
-                                ret -= toInteger(elem)->value();
-                            }
-                        }
-                        return ObjectPtr(new Integer(ret));
-                    })));
+    addPrimitive(env, "/",
+            [](Arguments& args)
+            {
+                Integer::value_type ret = 1;
+                if (args.empty()) {
+                    ret = 1;
+                }
+                else if (args.size() == 1) {
+                    ObjectPtr elem = args.front();
+                    Integer::value_type val = toInteger(elem)->value();
+                    //TODO(plesslie): exception for divide by zero?
+                    ret = 1 / val;
+                }
+                else {
+                    ret = toInteger(args.front())->value();
+                    args.pop_front();
+                    for (const auto& arg: args) {
+                        ret /= toInteger(arg)->value();
+                    }
+                }
+                return ObjectPtr(new Integer(ret));
+            });
 
-    gPrimitives.emplace("*", ObjectPtr(new Primitive("*", [](Arguments& args)
-                    {
-                        Integer::value_type ret = 1;
-                        for (const auto& arg: args) {
-                            ret *= toInteger(arg)->value();
-                        }
-                        return ObjectPtr(new Integer(ret));
-                    })));
-
-    gPrimitives.emplace("/", ObjectPtr(new Primitive("/", [](Arguments& args)
-                    {
-                        Integer::value_type ret = 1;
-                        if (args.empty()) {
-                            ret = 1;
-                        }
-                        else if (args.size() == 1) {
-                            ObjectPtr elem = args.front();
-                            Integer::value_type val = toInteger(elem)->value();
-                            //TODO(plesslie): exception for divide by zero?
-                            ret = 1 / val;
-                        }
-                        else {
-                            ret = toInteger(args.front())->value();
-                            args.pop_front();
-                            for (const auto& arg: args) {
-                                ret /= toInteger(arg)->value();
-                            }
-                        }
-                        return ObjectPtr(new Integer(ret));
-                    })));
-
-    gPrimitives.emplace("write", ObjectPtr(new Primitive("write", [](Arguments& args)
-                    {
-                        if (args.empty()) {
-                            throw std::runtime_error("Expected 1 argument, none given");
-                        }
-                        else if (args.size() == 1) {
-                        //FIXME(plesslie): won't print control character (e.g. '\n') correctly
-                            std::cout << args.front()->toString() << std::endl;
-                        }
-                        else {
-                            throw std::runtime_error("Expected 1 argument, given: "
-                                    + std::to_string(args.size()));
-                        }
-                        return ObjectPtr(0);
-                    })));
+    addPrimitive(env, "write",
+            [](Arguments& args)
+            {
+                if (args.empty()) {
+                    throw std::runtime_error("Expected 1 argument, none given");
+                }
+                else if (args.size() == 1) {
+                //FIXME(plesslie): won't print control character (e.g. '\n') correctly
+                    std::cout << args.front()->toString() << std::endl;
+                }
+                else {
+                    throw std::runtime_error("Expected 1 argument, given: "
+                            + std::to_string(args.size()));
+                }
+                return ObjectPtr(0);
+            });
 
     addPrimitive(env, "boolean?", 
             [](Arguments& args)
