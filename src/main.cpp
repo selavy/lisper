@@ -276,70 +276,78 @@ void initializeEnvironment(Environment& env)
                         return ObjectPtr(0);
                     })));
 
-    gPrimitives.emplace("boolean?", ObjectPtr(new Primitive("boolean?", [](Arguments& args)
-                    {
-                        if (args.empty() || args.size() != 1) {
-                            throw std::runtime_error("Expected 1 argument, given " + std::to_string(args.size()) + " arguments");
-                        }
-                        return ObjectPtr(new Boolean(args.front()->isBoolean()));
-                    })));
+    addPrimitive(env, "boolean?", 
+            [](Arguments& args)
+            {
+                if (args.empty() || args.size() != 1) {
+                    throw std::runtime_error("Expected 1 argument, given " + std::to_string(args.size()) + " arguments");
+                }
+                return ObjectPtr(new Boolean(args.front()->isBoolean()));
+            });
 
-    gPrimitives.emplace("symbol?", ObjectPtr(new Primitive("symbol?", [](Arguments& args)
-                    {
-                        if (args.empty() || args.size() != 1) {
-                            throw std::runtime_error("Expected 1 argument, given " + std::to_string(args.size()) + " arguments");
-                        }
-                        return ObjectPtr(new Boolean(args.front()->isSymbol()));
-                    })));
+    addPrimitive(env, "symbol?",
+            [](Arguments& args)
+            {
+                if (args.empty() || args.size() != 1) {
+                    throw std::runtime_error("Expected 1 argument, given " + std::to_string(args.size()) + " arguments");
+                }
+                return ObjectPtr(new Boolean(args.front()->isSymbol()));
+            });
 
-    gPrimitives.emplace("char?", ObjectPtr(new Primitive("char?", [](Arguments& args)
-                    {
-                        if (args.empty() || args.size() != 1) {
-                            throw std::runtime_error("Expected 1 argument, given " + std::to_string(args.size()) + " arguments");
-                        }
-                        return ObjectPtr(new Boolean(args.front()->isChar()));
-                    })));
+    addPrimitive(env, "char?",
+            [](Arguments& args)
+            {
+                if (args.empty() || args.size() != 1) {
+                    throw std::runtime_error("Expected 1 argument, given " + std::to_string(args.size()) + " arguments");
+                }
+                return ObjectPtr(new Boolean(args.front()->isChar()));
+            });
 
-    gPrimitives.emplace("vector?", ObjectPtr(new Primitive("vector?", [](Arguments& args)
-                    {
-                        if (args.empty() || args.size() != 1) {
-                            throw std::runtime_error("Expected 1 argument, given " + std::to_string(args.size()) + " arguments");
-                        }
-                        return ObjectPtr(new Boolean(args.front()->isVector()));
-                    })));
+    addPrimitive(env, "vector?",
+            [](Arguments& args)
+            {
+                if (args.empty() || args.size() != 1) {
+                    throw std::runtime_error("Expected 1 argument, given " + std::to_string(args.size()) + " arguments");
+                }
+                return ObjectPtr(new Boolean(args.front()->isVector()));
+            });
 
-    gPrimitives.emplace("null?", ObjectPtr(new Primitive("null?", [](Arguments& args)
-                    {
-                        if (args.empty() || args.size() != 1) {
-                            throw std::runtime_error("Expected 1 argument, given " + std::to_string(args.size()) + " arguments");
-                        }
-                        const bool res = dynamic_cast<Empty*>(args.front().get()) != 0;
-                        return ObjectPtr(new Boolean(res));
-                    })));
+    addPrimitive(env, "null?",
+            [](Arguments& args)
+            {
+                if (args.empty() || args.size() != 1) {
+                    throw std::runtime_error("Expected 1 argument, given " + std::to_string(args.size()) + " arguments");
+                }
+                const bool res = dynamic_cast<Empty*>(args.front().get()) != 0;
+                return ObjectPtr(new Boolean(res));
+            });
 
-    gPrimitives.emplace("pair?", ObjectPtr(new Primitive("pair?", [](Arguments& args)
-                    {
-                        if (args.empty() || args.size() != 1) {
-                            throw std::runtime_error("Expected 1 argument, given " + std::to_string(args.size()) + " arguments");
-                        }
-                        return ObjectPtr(new Boolean(args.front()->isPair()));
-                    })));
+    addPrimitive(env, "pair?",
+            [](Arguments& args)
+            {
+                if (args.empty() || args.size() != 1) {
+                    throw std::runtime_error("Expected 1 argument, given " + std::to_string(args.size()) + " arguments");
+                }
+                return ObjectPtr(new Boolean(args.front()->isPair()));
+            });
 
-    gPrimitives.emplace("number?", ObjectPtr(new Primitive("number?", [](Arguments& args)
-                    {
-                        if (args.empty() || args.size() != 1) {
-                            throw std::runtime_error("Expected 1 argument, given " + std::to_string(args.size()) + " arguments");
-                        }
-                        return ObjectPtr(new Boolean(args.front()->isNumber()));
-                    })));
+    addPrimitive(env, "number?",
+            [](Arguments& args)
+            {
+                if (args.empty() || args.size() != 1) {
+                    throw std::runtime_error("Expected 1 argument, given " + std::to_string(args.size()) + " arguments");
+                }
+                return ObjectPtr(new Boolean(args.front()->isNumber()));
+            });
 
-    gPrimitives.emplace("string?", ObjectPtr(new Primitive("string?", [](Arguments& args)
-                    {
-                        if (args.empty() || args.size() != 1) {
-                            throw std::runtime_error("Expected 1 argument, given " + std::to_string(args.size()) + " arguments");
-                        }
-                        return ObjectPtr(new Boolean(args.front()->isString()));
-                    })));
+    addPrimitive(env, "string?",
+            [](Arguments& args)
+            {
+                if (args.empty() || args.size() != 1) {
+                    throw std::runtime_error("Expected 1 argument, given " + std::to_string(args.size()) + " arguments");
+                }
+                return ObjectPtr(new Boolean(args.front()->isString()));
+            });
 
     addPrimitive(env, "procedure?",
             [](Arguments& args)
