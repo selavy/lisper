@@ -16,6 +16,8 @@ public:
 
     void append(ObjectPtr obj);
 
+    ObjectPtr& operator[](std::size_t i);
+
     virtual std::string toString() const override;
 
     virtual std::string typeToString() const override;

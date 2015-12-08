@@ -119,15 +119,23 @@ ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
     else if (Boolean::isBoolean(token.c_str())) {
         return ObjectPtr(new Boolean(token.c_str()));
     }
-    else if (token == "[") {
-        ObjectPtr vec(new Vector);
-        Token front = tokens.front();
-        while (front != "]") {
-            dynamic_cast<Vector*>(vec.get())->append(std::move(evaluate(tokens, env)));
-            front = tokens.front();
+    else if (token == "#") {
+        token = tokens.front();
+        tokens.pop_front();
+        if (token == "(") { // vector
+            ObjectPtr vec(new Vector);
+            Token front = tokens.front();
+            while (front != ")") {
+                dynamic_cast<Vector*>(vec.get())->append(std::move(evaluate(tokens, env)));
+                front = tokens.front();
+            }
+            tokens.pop_front(); // remove final ')' character
+            return vec;
         }
-        tokens.pop_front(); // remove final ']' character
-        return vec;
+        else {
+            //TODO(plesslie): handle characters
+            throw std::runtime_error("Invalid token: " + token);
+        }
     }
     else if (token == "(") {
         Token front = tokens.front();
@@ -366,7 +374,7 @@ int main(int argc, char** argv)
         "(null? '())",
         "(pair? '(1 2))",
         "(pair? '(1 2 3 4 5 6))",
-        "[1 2 3 4 5]"
+        "#(1 2 3 4 5)"
     };
 
     for (const auto& c : cases)

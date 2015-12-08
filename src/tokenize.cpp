@@ -57,20 +57,21 @@ Tokens tokenize(std::istream& is)
                 }
                 ret.push_back(")");
                 break;
-            case '[': // begin vector
-                if (!curr.empty()) {
-                    ret.push_back(curr);
-                    curr = "";
-                }
-                ret.push_back("[");
-                break;
-            case ']': // end vector
-                if (!curr.empty()) {
-                    ret.push_back(curr);
-                    curr = "";
-                }
-                ret.push_back("]");
-                break;
+                //REVISIT(plesslie): add support for square brackets?
+//            case '[': // begin vector
+//                if (!curr.empty()) {
+//                    ret.push_back(curr);
+//                    curr = "";
+//                }
+//                ret.push_back("[");
+//                break;
+//            case ']': // end vector
+//                if (!curr.empty()) {
+//                    ret.push_back(curr);
+//                    curr = "";
+//                }
+//                ret.push_back("]");
+//                break;
             default:
                 curr += c;
             }

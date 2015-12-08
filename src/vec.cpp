@@ -23,10 +23,18 @@ void Vector::append(ObjectPtr obj)
     objs_.push_back(std::move(obj));
 }
 
+ObjectPtr& Vector::operator[](std::size_t i)
+{
+    if (i > objs_.size()) {
+        throw std::runtime_error("Invalid access of element: " + std::to_string(i));
+    }
+    return objs_[i];
+}
+
 std::string Vector::toString() const 
 {
     std::stringstream ss;
-    ss << "[";
+    ss << "#(";
     bool first = true;
     for (const auto& o: objs_) {
         if (first) {
@@ -37,7 +45,7 @@ std::string Vector::toString() const
             ss << " " << o->toString();
         }
     }
-    ss << "]";
+    ss << ")";
     return ss.str();
 }
 
