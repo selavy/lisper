@@ -372,6 +372,25 @@ void initializeEnvironment(Environment& env)
                 POP(args);
                 return toVector(vec)->operator[](toInteger(index)->value());
             });
+
+    addPrimitive(env, "vector-set!",
+            [](Arguments& args)
+            {
+                if (args.empty() || args.size() != 3) {
+                    throw std::runtime_error("Expected 3 arguments, given " + std::to_string(args.size()) + " arguments");
+                }
+                ObjectPtr vec = args.front();
+                POP(args);
+                ObjectPtr index = args.front();
+                POP(args);
+                ObjectPtr obj = args.front();
+                POP(args);
+
+                using std::swap;
+                swap(toVector(vec)->operator[](toInteger(index)->value()), obj);
+                //TEMP(plesslie): should return Empty
+                return vec;
+            });
 }
 
 int main(int argc, char** argv)
@@ -408,7 +427,8 @@ int main(int argc, char** argv)
         "(pair? '(1 2 3 4 5 6))",
         "#(1 2 3 4 5)",
         "(vector-length '#(1 2 3 4 5))",
-        "(vector-ref '#(1 1 2 3 5 8 13 21) 5)"
+        "(vector-ref '#(1 1 2 3 5 8 13 21) 5)",
+        "(vector-set! '#(0 1 2 3 4 5) 3 27)" // this should raise &assertion exception for trying to set in constant vector
     };
 
     for (const auto& c : cases)
