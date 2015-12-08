@@ -18,6 +18,7 @@
 #include "empty.h"
 #include "procedure.h"
 #include "primitive.h"
+#include "vec.h"
 
 typedef std::unordered_map<std::string, ObjectPtr> Environment;
 typedef std::unordered_map<std::string, ObjectPtr> Primitives;
@@ -111,20 +112,30 @@ ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
                 objs.push_back(std::move(evaluate(tokens, env)));
                 token = tokens.front();
             } 
+            tokens.pop_front(); // remove final ')'
             return createList(ObjectPtr(new Empty), objs);
         }
     }
     else if (Boolean::isBoolean(token.c_str())) {
         return ObjectPtr(new Boolean(token.c_str()));
     }
-    else if (token[0] == '(') {
+    else if (token == "[") {
+        ObjectPtr vec(new Vector);
+        Token front = tokens.front();
+        while (front != "]") {
+            dynamic_cast<Vector*>(vec.get())->append(std::move(evaluate(tokens, env)));
+            front = tokens.front();
+        }
+        tokens.pop_front(); // remove final ']' character
+        return vec;
+    }
+    else if (token == "(") {
         Token front = tokens.front();
         std::list<ObjectPtr> lst;
         while (front != ")") {
             lst.push_back(std::move(evaluate(tokens, env)));
             front = tokens.front();
         }
-        
         tokens.pop_front(); // remove final ')' character
         return evaluateList(lst, env);
     }
@@ -354,7 +365,8 @@ int main(int argc, char** argv)
         "'()",
         "(null? '())",
         "(pair? '(1 2))",
-        "(pair? '(1 2 3 4 5 6))"
+        "(pair? '(1 2 3 4 5 6))",
+        "[1 2 3 4 5]"
     };
 
     for (const auto& c : cases)
