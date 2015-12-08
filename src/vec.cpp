@@ -25,7 +25,7 @@ void Vector::append(ObjectPtr obj)
 
 ObjectPtr& Vector::operator[](std::size_t i)
 {
-    if (i > objs_.size()) {
+    if (i > objs_.size() || i < 0) {
         throw std::runtime_error("Invalid access of element: " + std::to_string(i));
     }
     return objs_[i];

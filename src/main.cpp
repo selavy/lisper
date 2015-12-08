@@ -20,6 +20,9 @@
 #include "primitive.h"
 #include "vec.h"
 
+#define POP(x) x.pop_front()
+#define PUSH(x) x.push_back()
+
 typedef std::unordered_map<std::string, ObjectPtr> Environment;
 typedef std::unordered_map<std::string, ObjectPtr> Primitives;
 static Primitives gPrimitives;
@@ -98,28 +101,45 @@ ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
     else if (token == "'") {
         token = tokens.front();
         tokens.pop_front();
-        if (token != "(") {
-            throw std::runtime_error("Invalid token: " + token);
+        if (token == "(") { // quoted list
+            token = tokens.front();
+            tokens.pop_front();
+            if (token == ")") {
+                return ObjectPtr(new Empty);
+            }
+            else {
+                std::list<ObjectPtr> objs;
+                while (token != ")") {
+                    objs.push_back(std::move(evaluate(tokens, env)));
+                    token = tokens.front();
+                } 
+                tokens.pop_front(); // remove final ')'
+                return createList(ObjectPtr(new Empty), objs);
+            }
         }
-        token = tokens.front();
-        tokens.pop_front();
-        if (token == ")") {
-            return ObjectPtr(new Empty);
-        }
+//        else if (token == "#") {
+//            token = tokens.front();
+//            tokens.pop_front();
+//            if (token != "(") {
+//                throw std::runtime_error("Invalid token: " + token);
+//            }
+//            ObjectPtr vec(new Vector);
+//            Token front = tokens.front();
+//            while (front != ")") {
+//                dynamic_cast<Vector*>(vec.get())->append(std::move(evaluate(tokens, env)));
+//                front = tokens.front();
+//            }
+//            tokens.pop_front(); // remove final ')' character
+//            return vec;
+//        }
         else {
-            std::list<ObjectPtr> objs;
-            while (token != ")") {
-                objs.push_back(std::move(evaluate(tokens, env)));
-                token = tokens.front();
-            } 
-            tokens.pop_front(); // remove final ')'
-            return createList(ObjectPtr(new Empty), objs);
+            throw std::runtime_error("Invalid token: " + token);
         }
     }
     else if (Boolean::isBoolean(token.c_str())) {
         return ObjectPtr(new Boolean(token.c_str()));
     }
-    else if (token == "#") {
+    else if (token == "#" || token == "'#") {
         token = tokens.front();
         tokens.pop_front();
         if (token == "(") { // vector
@@ -346,13 +366,26 @@ void initializeEnvironment(Environment& env)
                 return ObjectPtr(new Boolean(args.front()->isProcedure()));
             });
 
-    addPrimitive(env, "vector-length?",
+    addPrimitive(env, "vector-length",
             [](Arguments& args)
             {
                 if (args.empty() || args.size() != 1) {
                     throw std::runtime_error("Expected 1 argument, given " + std::to_string(args.size()) + " arguments");
                 }
                 return ObjectPtr(new Integer(toVector(args.front())->size()));
+            });
+
+    addPrimitive(env, "vector-ref",
+            [](Arguments& args)
+            {
+                if (args.empty() || args.size() != 2) {
+                    throw std::runtime_error("Expected 2 arguments, given " + std::to_string(args.size()) + " arguments");
+                }
+                ObjectPtr vec = args.front();
+                POP(args);
+                ObjectPtr index = args.front();
+                POP(args);
+                return toVector(vec)->operator[](toInteger(index)->value());
             });
 }
 
@@ -389,7 +422,8 @@ int main(int argc, char** argv)
         "(pair? '(1 2))",
         "(pair? '(1 2 3 4 5 6))",
         "#(1 2 3 4 5)",
-        "(vector-length? #(1 2 3 4 5))"
+        "(vector-length '#(1 2 3 4 5))",
+        "(vector-ref '#(1 1 2 3 5 8 13 21) 5)"
     };
 
     for (const auto& c : cases)
