@@ -21,7 +21,7 @@
 #include "vec.h"
 
 #define POP(x) x.pop_front()
-#define PUSH(x) x.push_back()
+#define PUSH(x, v) x.push_back(v)
 
 typedef std::unordered_map<std::string, ObjectPtr> Environment;
 typedef std::unordered_map<std::string, ObjectPtr> Primitives;
@@ -33,7 +33,7 @@ std::list<typename CONT::value_type> toList(const CONT& container)
 {
     std::list<typename CONT::value_type> ret;
     for (const auto& it: container)
-        ret.push_back(it);
+        PUSH(ret, it);
     return ret;
 }
 
@@ -110,7 +110,7 @@ ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
             else {
                 std::list<ObjectPtr> objs;
                 while (token != ")") {
-                    objs.push_back(std::move(evaluate(tokens, env)));
+                    PUSH(objs, std::move(evaluate(tokens, env)));
                     token = tokens.front();
                 } 
                 tokens.pop_front(); // remove final ')'
@@ -161,7 +161,7 @@ ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
         Token front = tokens.front();
         std::list<ObjectPtr> lst;
         while (front != ")") {
-            lst.push_back(std::move(evaluate(tokens, env)));
+            PUSH(lst, std::move(evaluate(tokens, env)));
             front = tokens.front();
         }
         tokens.pop_front(); // remove final ')' character
