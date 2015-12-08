@@ -8,7 +8,7 @@
 class Primitive : public Procedure
 {
 public:
-    typedef ObjectPtr (*FuncDef)(Arguments&);
+    typedef ObjectPtr (*FuncDef)(Arguments&, Environment&);
 
 public:
     Primitive(const char* name, FuncDef&& def);

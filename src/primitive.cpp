@@ -10,7 +10,7 @@ Primitive::Primitive(const char* name, FuncDef&& def)
 
 ObjectPtr Primitive::evaluate(Arguments& args, Environment& env) 
 {
-    return def_(args);
+    return def_(args, env);
 }
 
 std::string Primitive::typeToString() const

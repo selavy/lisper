@@ -185,7 +185,7 @@ void initializeEnvironment(Environment& env)
 {
     //TODO(plesslie): remove these from symbol map and add case to evaluate()
     addPrimitive(env, "+",
-            [](Arguments& args)
+            [](Arguments& args, Environment& env)
             {
                 Integer::value_type ret = 0;
                 for (const auto& arg: args) {
@@ -195,7 +195,7 @@ void initializeEnvironment(Environment& env)
             });
 
     addPrimitive(env, "-",
-            [](Arguments& args)
+            [](Arguments& args, Environment& env)
             {
                 Integer::value_type ret = 0;
                 if (args.empty()) {
@@ -220,7 +220,7 @@ void initializeEnvironment(Environment& env)
             });
 
     addPrimitive(env, "*",
-            [](Arguments& args)
+            [](Arguments& args, Environment& env)
             {
                 Integer::value_type ret = 1;
                 for (const auto& arg: args) {
@@ -230,7 +230,7 @@ void initializeEnvironment(Environment& env)
             });
 
     addPrimitive(env, "/",
-            [](Arguments& args)
+            [](Arguments& args, Environment& env)
             {
                 Integer::value_type ret = 1;
                 if (args.empty()) {
@@ -253,7 +253,7 @@ void initializeEnvironment(Environment& env)
             });
 
     addPrimitive(env, "write",
-            [](Arguments& args)
+            [](Arguments& args, Environment& env)
             {
                 if (args.empty()) {
                     throw std::runtime_error("Expected 1 argument, none given");
@@ -270,7 +270,7 @@ void initializeEnvironment(Environment& env)
             });
 
     addPrimitive(env, "boolean?", 
-            [](Arguments& args)
+            [](Arguments& args, Environment& env)
             {
                 if (args.empty() || args.size() != 1) {
                     throw std::runtime_error("Expected 1 argument, given " + std::to_string(args.size()) + " arguments");
@@ -279,7 +279,7 @@ void initializeEnvironment(Environment& env)
             });
 
     addPrimitive(env, "symbol?",
-            [](Arguments& args)
+            [](Arguments& args, Environment& env)
             {
                 if (args.empty() || args.size() != 1) {
                     throw std::runtime_error("Expected 1 argument, given " + std::to_string(args.size()) + " arguments");
@@ -288,7 +288,7 @@ void initializeEnvironment(Environment& env)
             });
 
     addPrimitive(env, "char?",
-            [](Arguments& args)
+            [](Arguments& args, Environment& env)
             {
                 if (args.empty() || args.size() != 1) {
                     throw std::runtime_error("Expected 1 argument, given " + std::to_string(args.size()) + " arguments");
@@ -297,7 +297,7 @@ void initializeEnvironment(Environment& env)
             });
 
     addPrimitive(env, "vector?",
-            [](Arguments& args)
+            [](Arguments& args, Environment& env)
             {
                 if (args.empty() || args.size() != 1) {
                     throw std::runtime_error("Expected 1 argument, given " + std::to_string(args.size()) + " arguments");
@@ -306,7 +306,7 @@ void initializeEnvironment(Environment& env)
             });
 
     addPrimitive(env, "null?",
-            [](Arguments& args)
+            [](Arguments& args, Environment& env)
             {
                 if (args.empty() || args.size() != 1) {
                     throw std::runtime_error("Expected 1 argument, given " + std::to_string(args.size()) + " arguments");
@@ -316,7 +316,7 @@ void initializeEnvironment(Environment& env)
             });
 
     addPrimitive(env, "pair?",
-            [](Arguments& args)
+            [](Arguments& args, Environment& env)
             {
                 if (args.empty() || args.size() != 1) {
                     throw std::runtime_error("Expected 1 argument, given " + std::to_string(args.size()) + " arguments");
@@ -325,7 +325,7 @@ void initializeEnvironment(Environment& env)
             });
 
     addPrimitive(env, "number?",
-            [](Arguments& args)
+            [](Arguments& args, Environment& env)
             {
                 if (args.empty() || args.size() != 1) {
                     throw std::runtime_error("Expected 1 argument, given " + std::to_string(args.size()) + " arguments");
@@ -334,7 +334,7 @@ void initializeEnvironment(Environment& env)
             });
 
     addPrimitive(env, "string?",
-            [](Arguments& args)
+            [](Arguments& args, Environment& env)
             {
                 if (args.empty() || args.size() != 1) {
                     throw std::runtime_error("Expected 1 argument, given " + std::to_string(args.size()) + " arguments");
@@ -343,7 +343,7 @@ void initializeEnvironment(Environment& env)
             });
 
     addPrimitive(env, "procedure?",
-            [](Arguments& args)
+            [](Arguments& args, Environment& env)
             {
                 if (args.empty() || args.size() != 1) {
                     throw std::runtime_error("Expected 1 argument, given " + std::to_string(args.size()) + " arguments");
@@ -352,7 +352,7 @@ void initializeEnvironment(Environment& env)
             });
 
     addPrimitive(env, "vector-length",
-            [](Arguments& args)
+            [](Arguments& args, Environment& env)
             {
                 if (args.empty() || args.size() != 1) {
                     throw std::runtime_error("Expected 1 argument, given " + std::to_string(args.size()) + " arguments");
@@ -361,7 +361,7 @@ void initializeEnvironment(Environment& env)
             });
 
     addPrimitive(env, "vector-ref",
-            [](Arguments& args)
+            [](Arguments& args, Environment& env)
             {
                 if (args.empty() || args.size() != 2) {
                     throw std::runtime_error("Expected 2 arguments, given " + std::to_string(args.size()) + " arguments");
@@ -374,7 +374,7 @@ void initializeEnvironment(Environment& env)
             });
 
     addPrimitive(env, "vector-set!",
-            [](Arguments& args)
+            [](Arguments& args, Environment& env)
             {
                 if (args.empty() || args.size() != 3) {
                     throw std::runtime_error("Expected 3 arguments, given " + std::to_string(args.size()) + " arguments");
