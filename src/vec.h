@@ -18,6 +18,8 @@ public:
 
     ObjectPtr& operator[](std::size_t i);
 
+    std::size_t size() const;
+
     virtual std::string toString() const override;
 
     virtual std::string typeToString() const override;
@@ -41,5 +43,7 @@ public:
 private:
     std::vector<ObjectPtr> objs_;
 };
+
+Vector* toVector(const ObjectPtr& p);
 
 #endif // VEC__H_

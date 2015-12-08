@@ -186,6 +186,7 @@ void initializeEnvironment(Environment& env)
     env.emplace("number?", ObjectPtr(new Symbol("number?")));
     env.emplace("string?", ObjectPtr(new Symbol("string?")));
     env.emplace("procedure?", ObjectPtr(new Symbol("procedure?")));
+    env.emplace("vector-length?", ObjectPtr(new Symbol("vector-length?")));
 
 
     gPrimitives.emplace("+", ObjectPtr(new Primitive("+", [](Arguments& args)
@@ -340,6 +341,14 @@ void initializeEnvironment(Environment& env)
                         }
                         return ObjectPtr(new Boolean(args.front()->isProcedure()));
                     })));
+
+    gPrimitives.emplace("vector-length?", ObjectPtr(new Primitive("vector-length?", [](Arguments& args)
+                    {
+                        if (args.empty() || args.size() != 1) {
+                            throw std::runtime_error("Expected 1 argument, given " + std::to_string(args.size()) + " arguments");
+                        }
+                        return ObjectPtr(new Integer(toVector(args.front())->size()));
+                    })));
 }
 
 int main(int argc, char** argv)
@@ -374,7 +383,8 @@ int main(int argc, char** argv)
         "(null? '())",
         "(pair? '(1 2))",
         "(pair? '(1 2 3 4 5 6))",
-        "#(1 2 3 4 5)"
+        "#(1 2 3 4 5)",
+        "(vector-length? #(1 2 3 4 5))"
     };
 
     for (const auto& c : cases)

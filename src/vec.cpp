@@ -31,6 +31,11 @@ ObjectPtr& Vector::operator[](std::size_t i)
     return objs_[i];
 }
 
+std::size_t Vector::size() const
+{
+    return objs_.size();
+}
+
 std::string Vector::toString() const 
 {
     std::stringstream ss;
@@ -92,4 +97,11 @@ bool Vector::isString() const
 bool Vector::isProcedure() const 
 {
     return false;
+}
+
+Vector* toVector(const ObjectPtr& p)
+{
+    Vector* i = dynamic_cast<Vector*>(p.get());
+    if (!i) throw std::runtime_error("Object not vector: " + p->toString());
+    return i;
 }
