@@ -53,20 +53,26 @@ ObjectPtr evaluateList(std::list<ObjectPtr>& tokens, Environment& env)
     POP(tokens);
 
     const std::string& name = head->toString();
-    auto found = env.find(name);
-    if (found != std::end(env)) {
-        ObjectPtr& obj = found->second;
-        if (obj->isProcedure()) {
-            Procedure* proc = dynamic_cast<Procedure*>(obj.get());
-            return proc->evaluate(tokens, env);
+
+    Environment* scope = &env;
+    while (scope) {
+        auto found = scope->find(name);
+        if (found != std::end(*scope)) {
+            ObjectPtr& obj = found->second;
+            if (obj->isProcedure()) {
+                Procedure* proc = dynamic_cast<Procedure*>(obj.get());
+                return proc->evaluate(tokens, *scope);
+            }
+            else {
+                throw std::runtime_error("Did not find a procedure where it was expected: " + name);
+            }
         }
         else {
-            throw std::runtime_error("Did not find a procedure where it was expected: " + name);
+            scope = scope->getParent();
         }
     }
-    else {
-        throw std::runtime_error("Not a valid procedure: " + name);
-    }
+
+    throw std::runtime_error("Not a valid procedure: " + name);
 }
 
 //\! evaluate a list of tokens into an object.
@@ -154,7 +160,10 @@ ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
             front = tokens.front();
         }
         POP(tokens); // remove final ')' character
-        return evaluateList(lst, env);
+
+        Environment scope;
+        scope.setParent(&env);
+        return evaluateList(lst, scope);
     }
     else if (token[0] == ')') {
         throw std::runtime_error("Unmatched closing paren!");
