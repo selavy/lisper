@@ -4,6 +4,34 @@
 #include <unordered_map>
 #include "object.h"
 
-typedef std::unordered_map<std::string, ObjectPtr> Environment;
+//typedef std::unordered_map<std::string, ObjectPtr> Environment;
+
+class Environment
+{
+public:
+    typedef std::unordered_map<std::string, ObjectPtr> SymbolTable;
+    typedef SymbolTable::iterator iterator;
+    typedef SymbolTable::const_iterator const_iterator;
+
+public:
+    Environment();
+
+    iterator find(const std::string& key);
+
+    const_iterator find(const std::string& key) const;
+
+    void emplace(std::string&& key, ObjectPtr&& obj);
+
+    iterator begin();
+
+    iterator end();
+
+    const_iterator begin() const;
+
+    const_iterator end() const;
+
+private:
+     SymbolTable env_;
+};
 
 #endif // ENVIRONMENT__H_
