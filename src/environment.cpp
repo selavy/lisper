@@ -2,6 +2,7 @@
 
 Environment::Environment()
     : env_()
+    , parent_(0)
 {
 }
 
@@ -38,4 +39,14 @@ Environment::const_iterator Environment::begin() const
 Environment::const_iterator Environment::end() const
 {
     return std::end(env_);
+}
+
+void Environment::setParent(Environment* env)
+{
+    parent_ = env;
+}
+
+Environment* Environment::getParent()
+{
+    return parent_;
 }

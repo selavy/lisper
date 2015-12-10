@@ -25,7 +25,6 @@
 #define PUSH(x, v) x.push_back(v)
 
 typedef std::unordered_map<std::string, ObjectPtr> Primitives;
-static Primitives gPrimitives;
 
 //\! Converts container of iterables to std::list.
 template <class CONT>
@@ -54,14 +53,19 @@ ObjectPtr evaluateList(std::list<ObjectPtr>& tokens, Environment& env)
     POP(tokens);
 
     const std::string& name = head->toString();
-    auto found = gPrimitives.find(name);
-    if (found != std::end(gPrimitives)) {
-        ObjectPtr prim = found->second;
-        Primitive* primPtr = dynamic_cast<Primitive*>(prim.get());
-        return primPtr->evaluate(tokens, env);
+    auto found = env.find(name);
+    if (found != std::end(env)) {
+        ObjectPtr& obj = found->second;
+        if (obj->isProcedure()) {
+            Procedure* proc = dynamic_cast<Procedure*>(obj.get());
+            return proc->evaluate(tokens, env);
+        }
+        else {
+            throw std::runtime_error("Did not find a procedure where it was expected: " + name);
+        }
     }
     else {
-        throw std::runtime_error("Not a valid primitive: " + head->toString());
+        throw std::runtime_error("Not a valid procedure: " + name);
     }
 }
 
@@ -177,8 +181,7 @@ ObjectPtr process(const char* str, Environment& env)
 template <class Func>
 void addPrimitive(Environment& env, const char* symbol, Func&& func)
 {
-    env.emplace(symbol, ObjectPtr(new Symbol(symbol)));
-    gPrimitives.emplace(symbol, ObjectPtr(new Primitive(symbol, std::forward<Func>(func))));
+    env.emplace(symbol, ObjectPtr(new Primitive(symbol, std::forward<Func>(func))));
 }
 
 void initializeEnvironment(Environment& env)

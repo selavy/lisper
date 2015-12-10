@@ -30,8 +30,14 @@ public:
 
     const_iterator end() const;
 
+    void setParent(Environment* env);
+
+    Environment* getParent();
+
 private:
      SymbolTable env_;
+
+     Environment* parent_;
 };
 
 #endif // ENVIRONMENT__H_
