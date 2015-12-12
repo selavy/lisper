@@ -20,9 +20,7 @@
 #include "primitive.h"
 #include "vec.h"
 #include "environment.h"
-
-#define POP(x) x.pop_front()
-#define PUSH(x, v) x.push_back(v)
+#include "eval.h"
 
 typedef std::unordered_map<std::string, ObjectPtr> Primitives;
 
@@ -46,34 +44,6 @@ ObjectPtr createList(ObjectPtr curr, std::list<ObjectPtr>& objs)
     return createList(std::move(ObjectPtr(new Pair(front, curr))), objs);
 }
 
-//\! Evaluates a std::list<> into a single ObjectPtr
-ObjectPtr evaluateList(std::list<ObjectPtr>& tokens, Environment& env)
-{
-    ObjectPtr head = tokens.front();
-    POP(tokens);
-
-    const std::string& name = head->toString();
-
-    Environment* scope = &env;
-    while (scope) {
-        auto found = scope->find(name);
-        if (found != std::end(*scope)) {
-            ObjectPtr& obj = found->second;
-            if (obj->isProcedure()) {
-                Procedure* proc = dynamic_cast<Procedure*>(obj.get());
-                return proc->evaluate(tokens, *scope);
-            }
-            else {
-                throw std::runtime_error("Did not find a procedure where it was expected: " + name);
-            }
-        }
-        else {
-            scope = scope->getParent();
-        }
-    }
-
-    throw std::runtime_error("Not a valid procedure: " + name);
-}
 
 //\! evaluate a list of tokens into an object.
 ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)

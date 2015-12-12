@@ -15,6 +15,8 @@ add_executable(
   primitive.cpp
   environment.cpp
   vec.cpp
+  closure.cpp
+  eval.cpp
   main.cpp
   )
 
