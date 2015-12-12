@@ -21,6 +21,7 @@
 #include "vec.h"
 #include "environment.h"
 #include "eval.h"
+#include "init.h"
 
 typedef std::unordered_map<std::string, ObjectPtr> Primitives;
 
@@ -43,7 +44,6 @@ ObjectPtr createList(ObjectPtr curr, std::list<ObjectPtr>& objs)
     POP(objs);
     return createList(std::move(ObjectPtr(new Pair(front, curr))), objs);
 }
-
 
 //\! evaluate a list of tokens into an object.
 ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
@@ -124,13 +124,20 @@ ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
     }
     else if (token == "(") {
         Token front = tokens.front();
-
         if (front == "quote") {
             tokens.front() = "'";
             return evaluate(tokens, env);
         }
         else if (front == "begin") {
-            throw std::runtime_error("Unimplemented!");
+            std::list<ObjectPtr> lst;
+            POP(tokens);
+            front = tokens.front();
+            while (front != ")") {
+                PUSH(lst, std::move(evaluate(tokens, env)));
+                front = tokens.front();
+            }
+            POP(tokens);
+            return lst.back();
         }
         else if (front == "if") {
             std::list<ObjectPtr> lst;
@@ -193,246 +200,6 @@ ObjectPtr process(const char* str, Environment& env)
     return evaluate(tokens, env);
 }
 
-template <class Func>
-void addPrimitive(Environment& env, const char* symbol, Func&& func)
-{
-    env.emplace(symbol, ObjectPtr(new Primitive(symbol, std::forward<Func>(func))));
-}
-
-void initializeEnvironment(Environment& env)
-{
-    //TODO(plesslie): remove these from symbol map and add case to evaluate()
-    //
-    
-//    addPrimitive(env, "if",
-//            [](Arguments& args, Environment& env)
-//            {
-//                if (args.size() != 3) {
-//                    throw std::runtime_error("Expected 2 arguments, received: " + std::to_string(args.size()));
-//                }
-//
-//                auto arg = std::begin(args);
-//                // toBoolean() always succeeds
-//                if (toBoolean(*arg)->value()) {
-//                    ++arg;
-//                    return *arg;
-//                }
-//                else {
-//                    ++arg;
-//                    ++arg;
-//                    return *arg;
-//                }
-//            }); 
-    
-    addPrimitive(env, "+",
-            [](Arguments& args, Environment& env)
-            {
-                Integer::value_type ret = 0;
-                for (const auto& arg: args) {
-                    ret += toInteger(arg)->value();
-                }
-                return ObjectPtr(new Integer(ret));
-            });
-
-    addPrimitive(env, "-",
-            [](Arguments& args, Environment& env)
-            {
-                Integer::value_type ret = 0;
-                if (args.empty()) {
-                    ret = 0;
-                }
-                else if (args.size() == 1) {
-                    ObjectPtr elem = args.front();
-                    POP(args);
-                    ret -= toInteger(elem)->value();
-                }
-                else {
-                    // initialize with first element, subtract rest from that
-                    ret = toInteger(args.front())->value();
-
-                    // pop front and process cdr
-                    POP(args);
-                    for (const auto& elem: args) {
-                        ret -= toInteger(elem)->value();
-                    }
-                }
-                return ObjectPtr(new Integer(ret));
-            });
-
-    addPrimitive(env, "*",
-            [](Arguments& args, Environment& env)
-            {
-                Integer::value_type ret = 1;
-                for (const auto& arg: args) {
-                    ret *= toInteger(arg)->value();
-                }
-                return ObjectPtr(new Integer(ret));
-            });
-
-    addPrimitive(env, "/",
-            [](Arguments& args, Environment& env)
-            {
-                Integer::value_type ret = 1;
-                if (args.empty()) {
-                    ret = 1;
-                }
-                else if (args.size() == 1) {
-                    ObjectPtr elem = args.front();
-                    Integer::value_type val = toInteger(elem)->value();
-                    //TODO(plesslie): exception for divide by zero?
-                    ret = 1 / val;
-                }
-                else {
-                    ret = toInteger(args.front())->value();
-                    POP(args);
-                    for (const auto& arg: args) {
-                        ret /= toInteger(arg)->value();
-                    }
-                }
-                return ObjectPtr(new Integer(ret));
-            });
-
-    addPrimitive(env, "write",
-            [](Arguments& args, Environment& env)
-            {
-                if (args.empty()) {
-                    throw std::runtime_error("Expected 1 argument, none given");
-                }
-                else if (args.size() == 1) {
-                //FIXME(plesslie): won't print control character (e.g. '\n') correctly
-                    std::cout << args.front()->toString() << std::endl;
-                }
-                else {
-                    throw std::runtime_error("Expected 1 argument, given: "
-                            + std::to_string(args.size()));
-                }
-                return ObjectPtr(0);
-            });
-
-    addPrimitive(env, "boolean?", 
-            [](Arguments& args, Environment& env)
-            {
-                if (args.empty() || args.size() != 1) {
-                    throw std::runtime_error("Expected 1 argument, given " + std::to_string(args.size()) + " arguments");
-                }
-                return ObjectPtr(new Boolean(args.front()->isBoolean()));
-            });
-
-    addPrimitive(env, "symbol?",
-            [](Arguments& args, Environment& env)
-            {
-                if (args.empty() || args.size() != 1) {
-                    throw std::runtime_error("Expected 1 argument, given " + std::to_string(args.size()) + " arguments");
-                }
-                return ObjectPtr(new Boolean(args.front()->isSymbol()));
-            });
-
-    addPrimitive(env, "char?",
-            [](Arguments& args, Environment& env)
-            {
-                if (args.empty() || args.size() != 1) {
-                    throw std::runtime_error("Expected 1 argument, given " + std::to_string(args.size()) + " arguments");
-                }
-                return ObjectPtr(new Boolean(args.front()->isChar()));
-            });
-
-    addPrimitive(env, "vector?",
-            [](Arguments& args, Environment& env)
-            {
-                if (args.empty() || args.size() != 1) {
-                    throw std::runtime_error("Expected 1 argument, given " + std::to_string(args.size()) + " arguments");
-                }
-                return ObjectPtr(new Boolean(args.front()->isVector()));
-            });
-
-    addPrimitive(env, "null?",
-            [](Arguments& args, Environment& env)
-            {
-                if (args.empty() || args.size() != 1) {
-                    throw std::runtime_error("Expected 1 argument, given " + std::to_string(args.size()) + " arguments");
-                }
-                const bool res = dynamic_cast<Empty*>(args.front().get()) != 0;
-                return ObjectPtr(new Boolean(res));
-            });
-
-    addPrimitive(env, "pair?",
-            [](Arguments& args, Environment& env)
-            {
-                if (args.empty() || args.size() != 1) {
-                    throw std::runtime_error("Expected 1 argument, given " + std::to_string(args.size()) + " arguments");
-                }
-                return ObjectPtr(new Boolean(args.front()->isPair()));
-            });
-
-    addPrimitive(env, "number?",
-            [](Arguments& args, Environment& env)
-            {
-                if (args.empty() || args.size() != 1) {
-                    throw std::runtime_error("Expected 1 argument, given " + std::to_string(args.size()) + " arguments");
-                }
-                return ObjectPtr(new Boolean(args.front()->isNumber()));
-            });
-
-    addPrimitive(env, "string?",
-            [](Arguments& args, Environment& env)
-            {
-                if (args.empty() || args.size() != 1) {
-                    throw std::runtime_error("Expected 1 argument, given " + std::to_string(args.size()) + " arguments");
-                }
-                return ObjectPtr(new Boolean(args.front()->isString()));
-            });
-
-    addPrimitive(env, "procedure?",
-            [](Arguments& args, Environment& env)
-            {
-                if (args.empty() || args.size() != 1) {
-                    throw std::runtime_error("Expected 1 argument, given " + std::to_string(args.size()) + " arguments");
-                }
-                return ObjectPtr(new Boolean(args.front()->isProcedure()));
-            });
-
-    addPrimitive(env, "vector-length",
-            [](Arguments& args, Environment& env)
-            {
-                if (args.empty() || args.size() != 1) {
-                    throw std::runtime_error("Expected 1 argument, given " + std::to_string(args.size()) + " arguments");
-                }
-                return ObjectPtr(new Integer(toVector(args.front())->size()));
-            });
-
-    addPrimitive(env, "vector-ref",
-            [](Arguments& args, Environment& env)
-            {
-                if (args.empty() || args.size() != 2) {
-                    throw std::runtime_error("Expected 2 arguments, given " + std::to_string(args.size()) + " arguments");
-                }
-                ObjectPtr vec = args.front();
-                POP(args);
-                ObjectPtr index = args.front();
-                POP(args);
-                return toVector(vec)->operator[](toInteger(index)->value());
-            });
-
-    addPrimitive(env, "vector-set!",
-            [](Arguments& args, Environment& env)
-            {
-                if (args.empty() || args.size() != 3) {
-                    throw std::runtime_error("Expected 3 arguments, given " + std::to_string(args.size()) + " arguments");
-                }
-                ObjectPtr vec = args.front();
-                POP(args);
-                ObjectPtr index = args.front();
-                POP(args);
-                ObjectPtr obj = args.front();
-                POP(args);
-
-                using std::swap;
-                swap(toVector(vec)->operator[](toInteger(index)->value()), obj);
-                //TEMP(plesslie): should return Empty
-                return vec;
-            });
-}
-
 int main(int argc, char** argv)
 {
     std::vector<std::string> cases = {
@@ -455,27 +222,29 @@ int main(int argc, char** argv)
         "(/ 2)",
         "(write \"hello world!\")",
         "(/ 8 4)",
-        "(boolean? #t)",
-        "(boolean? #f)",
-        "(boolean? \"hello\")",
-        "(number? 1234)",
-        "(string? \"hello\")",
-        "(number? \"1234\")",
-        "'()",
-        "(null? '())",
-        "(pair? '(1 2))",
-        "(pair? '(1 2 3 4 5 6))",
-        "#(1 2 3 4 5)",
-        "(vector-length '#(1 2 3 4 5))",
-        "(vector-ref '#(1 1 2 3 5 8 13 21) 5)",
-        "(vector-set! '#(0 1 2 3 4 5) 3 27)", // this should raise &assertion exception for trying to set in constant vector
-        "(if #t 1 2)",
-        "(if #f 1 2)",
-        "(if #t (+ 1 3) (+ 1 5))",
-        "(if #f (+ 1 3) (+ 1 5))",
-        "(if 1 1 2)",
-        "(if #t (if #f 1 2) (if #f 3 4))",
-        "(quote (1 2 3))"
+        "(boolean? #t)",                        // => #t
+        "(boolean? #f)",                        // => #t
+        "(boolean? \"hello\")",                 // => #f
+        "(number? 1234)",                       // => #t
+        "(string? \"hello\")",                  // => #t
+        "(number? \"1234\")",                   // => #f
+        "'()",                                  // => '()
+        "(null? '())",                          // => #t
+        "(pair? '(1 2))",                       // => #t
+        "(pair? '(1 2 3 4 5 6))",               // => #t
+        "#(1 2 3 4 5)",                         // => #(1 2 3 4 5)
+        "(vector-length '#(1 2 3 4 5))",        // => 5
+        "(vector-ref '#(1 1 2 3 5 8 13 21) 5)", // => 8
+        "(vector-set! '#(0 1 2 3 4 5) 3 27)",   // this should raise &assertion exception for trying to set in constant vector
+        "(if #t 1 2)",                          // => 1
+        "(if #f 1 2)",                          // => 2
+        "(if #t (+ 1 3) (+ 1 5))",              // => 4
+        "(if #f (+ 1 3) (+ 1 5))",              // => 6
+        "(if 1 1 2)",                           // => 1
+        "(if #t (if #f 1 2) (if #f 3 4))",      // => 2
+        "(quote (1 2 3))",                      // => '(1 2 3)
+        "(begin (+ 1 2) (+ 3 4))",              // => 7
+        "(if (string? 123) 1 2)"                // => 2
     };
 
     for (const auto& c : cases)

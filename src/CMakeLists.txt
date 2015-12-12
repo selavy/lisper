@@ -17,6 +17,7 @@ add_executable(
   vec.cpp
   closure.cpp
   eval.cpp
+  init.cpp
   main.cpp
   )
 
