@@ -166,6 +166,28 @@ void addPrimitive(Environment& env, const char* symbol, Func&& func)
 void initializeEnvironment(Environment& env)
 {
     //TODO(plesslie): remove these from symbol map and add case to evaluate()
+    //
+    
+    addPrimitive(env, "if",
+            [](Arguments& args, Environment& env)
+            {
+                if (args.size() != 3) {
+                    throw std::runtime_error("Expected 2 arguments, received: " + std::to_string(args.size()));
+                }
+
+                auto arg = std::begin(args);
+                // toBoolean() always succeeds
+                if (toBoolean(*arg)->value()) {
+                    ++arg;
+                    return *arg;
+                }
+                else {
+                    ++arg;
+                    ++arg;
+                    return *arg;
+                }
+            }); 
+    
     addPrimitive(env, "+",
             [](Arguments& args, Environment& env)
             {
@@ -410,7 +432,13 @@ int main(int argc, char** argv)
         "#(1 2 3 4 5)",
         "(vector-length '#(1 2 3 4 5))",
         "(vector-ref '#(1 1 2 3 5 8 13 21) 5)",
-        "(vector-set! '#(0 1 2 3 4 5) 3 27)" // this should raise &assertion exception for trying to set in constant vector
+        "(vector-set! '#(0 1 2 3 4 5) 3 27)", // this should raise &assertion exception for trying to set in constant vector
+        "(if #t 1 2)",
+        "(if #f 1 2)",
+        "(if #t (+ 1 3) (+ 1 5))",
+        "(if #f (+ 1 3) (+ 1 5))",
+        "(if 1 1 2)",
+        "(if #t (if #f 1 2) (if #f 3 4))"
     };
 
     for (const auto& c : cases)

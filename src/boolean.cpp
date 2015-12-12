@@ -81,3 +81,13 @@ bool Boolean::isBoolean(const char* val)
         || (strncmp(val, FALSE_STR, strlen(FALSE_STR)) == 0)
         ;
 }
+
+Boolean* toBoolean(const ObjectPtr& p)
+{
+    static Boolean TRUE(true);
+    Boolean* b = dynamic_cast<Boolean*>(p.get());
+    if (b) return b;
+    else {
+        return &TRUE;
+    }
+}

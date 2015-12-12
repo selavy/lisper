@@ -45,4 +45,6 @@ private:
     static const char * const TRUE_STR;
 };
 
+Boolean* toBoolean(const ObjectPtr& p);
+
 #endif // BOOLEAN__H_
