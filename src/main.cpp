@@ -25,6 +25,10 @@
 
 typedef std::unordered_map<std::string, ObjectPtr> Primitives;
 
+std::list<ObjectPtr> readTail(std::list<Token>& tokens, Environment& env);
+ObjectPtr createList(ObjectPtr curr, std::list<ObjectPtr>& objs);
+ObjectPtr evaluate(std::list<Token>& tokens, Environment& env);
+
 //\! Converts container of iterables to std::list.
 template <class CONT>
 std::list<typename CONT::value_type> toList(const CONT& container)
@@ -44,6 +48,7 @@ ObjectPtr createList(ObjectPtr curr, std::list<ObjectPtr>& objs)
     POP(objs);
     return createList(std::move(ObjectPtr(new Pair(front, curr))), objs);
 }
+
 
 //\! evaluate a list of tokens into an object.
 ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
@@ -88,12 +93,7 @@ ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
                 return ObjectPtr(new Empty);
             }
             else {
-                std::list<ObjectPtr> objs;
-                while (token != ")") {
-                    PUSH(objs, std::move(evaluate(tokens, env)));
-                    token = tokens.front();
-                } 
-                POP(tokens); // remove final ')'
+                std::list<ObjectPtr> objs = std::move(readTail(tokens, env));
                 return createList(ObjectPtr(new Empty), objs);
             }
         }
@@ -124,55 +124,34 @@ ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
     }
     else if (token == "(") {
         Token front = tokens.front();
-        if (front == "quote") {
+        if (front == "quote") { // REVISIT(plesslie): not working correctly, CURRENTLY: (quote (1 2 3)) => '(2 3), should be '(1 2 3)
             tokens.front() = "'";
             return evaluate(tokens, env);
         }
         else if (front == "begin") {
-            std::list<ObjectPtr> lst;
             POP(tokens);
-            front = tokens.front();
-            while (front != ")") {
-                PUSH(lst, std::move(evaluate(tokens, env)));
-                front = tokens.front();
-            }
-            POP(tokens);
+            std::list<ObjectPtr> lst = std::move(readTail(tokens, env));
             return lst.back();
         }
         else if (front == "if") {
-            std::list<ObjectPtr> lst;
             POP(tokens);
-            front = tokens.front();
-            while (front != ")") {
-                PUSH(lst, std::move(evaluate(tokens, env)));
-                front = tokens.front();
-            }
-            POP(tokens); // remove final ')' character
-
+            std::list<ObjectPtr> lst = std::move(readTail(tokens, env));
             if (lst.size() != 3) {
                 throw std::runtime_error("if statement expects 3 arguments, given " + std::to_string(lst.size()));
             }
-            auto first = std::begin(lst);
-            if (toBoolean(*first)->value()) {
-                ++first;
-                return *first;
+            auto first = FIRST(lst);
+            if (toBoolean(first)->value()) {
+                return SECOND(lst);
             }
             else {
-                ++first; ++first;
-                return *first;
+                return THIRD(lst);
             }
         }
         else if (front == "lambda") {
             throw std::runtime_error("Unimplemented!");
         }
         else { // function call
-            std::list<ObjectPtr> lst;
-            while (front != ")") {
-                PUSH(lst, std::move(evaluate(tokens, env)));
-                front = tokens.front();
-            }
-            POP(tokens); // remove final ')' character
-
+            std::list<ObjectPtr> lst = std::move(readTail(tokens, env));
             Environment scope;
             scope.setParent(&env);
             return evaluateList(lst, scope);
@@ -188,6 +167,18 @@ ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
         }
         return found->second;
     }    
+}
+
+std::list<ObjectPtr> readTail(std::list<Token>& tokens, Environment& env)
+{
+    Token token = tokens.front();
+    std::list<ObjectPtr> objs;
+    while (token != ")") {
+        PUSH(objs, std::move(evaluate(tokens, env)));
+        token = tokens.front();
+    } 
+    POP(tokens); // remove final ')'
+    return objs;
 }
 
 //\! Take a string read in and evaluate it.
@@ -229,6 +220,7 @@ int main(int argc, char** argv)
         "(string? \"hello\")",                  // => #t
         "(number? \"1234\")",                   // => #f
         "'()",                                  // => '()
+        "'(1 2 3)",                             // => '(1 2 3)
         "(null? '())",                          // => #t
         "(pair? '(1 2))",                       // => #t
         "(pair? '(1 2 3 4 5 6))",               // => #t
