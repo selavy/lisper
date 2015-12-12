@@ -26,9 +26,15 @@
 
 typedef std::unordered_map<std::string, ObjectPtr> Primitives;
 
+template <class CONT>
+std::list<typename CONT::value_type> toList(const CONT& container);
+
 std::list<ObjectPtr> readTail(std::list<Token>& tokens, Environment& env);
+
 ObjectPtr createList(ObjectPtr curr, std::list<ObjectPtr>& objs);
+
 ObjectPtr evaluate(std::list<Token>& tokens, Environment& env);
+
 std::list<ObjectPtr> unwrapPairs(ObjectPtr pair);
 
 //\! Converts container of iterables to std::list.
@@ -123,13 +129,6 @@ ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
             throw std::runtime_error("Invalid token: " + token);
         }
     }
-//    else if (token == "lambda") {
-//        std::list<ObjectPtr> body = std::move(readTail(tokens, env));
-//        ObjectPtr first = body.front();
-//        std::list<ObjectPtr> args = std::move(unwrapPairs(first));
-//        POP(body);
-//        return ObjectPtr(new Closure(std::move(args), std::move(body), env));
-//    }
     else if (token == "(") {
         Token front = tokens.front();
         if (front == "quote") { // REVISIT(plesslie): not working correctly, CURRENTLY: (quote (1 2 3)) => '(2 3), should be '(1 2 3)
@@ -167,11 +166,31 @@ ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
             }
         }
         else if (front == "lambda") {
+            std::list<std::string> arguments;
+            POP(tokens);
+            front = tokens.front();
+            if (front == "(") {
+                front = tokens.front();
+                while (front != ")") {
+                    arguments.push_back(front);
+                    POP(tokens);
+                    front = tokens.front();
+                }
+                POP(tokens); 
+            }
+            else {
+                while (front != "(") {
+                    arguments.push_back(front);
+                    POP(tokens);
+                    front = tokens.front();
+                }
+            }
+
             std::list<ObjectPtr> body = std::move(readTail(tokens, env));
-            ObjectPtr first = body.front();
-            std::list<ObjectPtr> args = std::move(unwrapPairs(first));
-            POP(body);
-            return ObjectPtr(new Closure(std::move(args), std::move(body), env));
+            //ObjectPtr first = body.front();
+            //std::list<ObjectPtr> args = std::move(unwrapPairs(first));
+            //POP(body);
+            return ObjectPtr(new Closure(std::move(arguments), std::move(body), env));
         }
         else { // function call
             std::list<ObjectPtr> lst = std::move(readTail(tokens, env));

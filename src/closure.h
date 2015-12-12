@@ -3,12 +3,13 @@
 
 #include <cstddef>
 #include <list>
+#include <string>
 #include "procedure.h"
 
 class Closure : public Procedure
 {
 public:
-    Closure(Arguments args, std::list<ObjectPtr> body, Environment& env);
+    Closure(std::list<std::string> args, std::list<ObjectPtr> body, Environment& env);
 
     virtual ObjectPtr evaluate(Arguments& args, Environment& env) override;
 
@@ -17,7 +18,7 @@ public:
     virtual std::string toString() const override;
 
 private:
-    Arguments args_; // symbols for names of arguments
+    std::list<std::string> args_; // symbols for names of arguments
 
     std::size_t nArgs_;
 

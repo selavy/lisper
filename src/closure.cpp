@@ -2,7 +2,7 @@
 #include <sstream>
 #include "eval.h"
 
-Closure::Closure(Arguments args, std::list<ObjectPtr> body, Environment& env)
+Closure::Closure(std::list<std::string> args, std::list<ObjectPtr> body, Environment& env)
     : args_(std::move(args))
     , nArgs_(args_.size())
     , body_(std::move(body))
@@ -21,7 +21,7 @@ ObjectPtr Closure::evaluate(Arguments& args, Environment& env)
     auto param = std::begin(args_);
     auto arg = std::begin(args);
     for (; arg != std::end(args); ++arg, ++param) {
-        env.emplace(std::move((*param)->toString()), std::move(*arg));
+        env.emplace(std::move(*param), std::move(*arg));
     }
     env.setParent(&env_);
     return evaluateList(body_, env);
