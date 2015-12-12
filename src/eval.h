@@ -3,6 +3,7 @@
 
 #include "object.h"
 #include <list>
+#include "tokenize.h"
 
 class Environment;
 
@@ -14,5 +15,13 @@ class Environment;
 
 //\! Evaluates a std::list<> into a single ObjectPtr
 ObjectPtr evaluateList(std::list<ObjectPtr>& tokens, Environment& env);
+
+ObjectPtr evaluate(std::list<Token>& tokens, Environment& env);
+
+ObjectPtr createList(ObjectPtr curr, std::list<ObjectPtr>& objs);
+
+std::list<ObjectPtr> readTail(std::list<Token>& tokens, Environment& env);
+
+std::list<ObjectPtr> unwrapPairs(ObjectPtr pair);
 
 #endif // EVAL__H_

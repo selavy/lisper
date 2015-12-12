@@ -9,7 +9,7 @@
 class Closure : public Procedure
 {
 public:
-    Closure(std::list<std::string> args, std::list<ObjectPtr> body, Environment& env);
+    Closure(std::list<std::string> args, std::list<std::string> body, Environment& env);
 
     virtual ObjectPtr evaluate(Arguments& args, Environment& env) override;
 
@@ -22,7 +22,7 @@ private:
 
     std::size_t nArgs_;
 
-    std::list<ObjectPtr> body_;
+    std::list<std::string> body_;
 
     Environment& env_;
 };

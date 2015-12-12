@@ -5,12 +5,27 @@
 #include <iostream>
 //GUBED
 
-Closure::Closure(std::list<std::string> args, std::list<ObjectPtr> body, Environment& env)
+Closure::Closure(std::list<std::string> args, std::list<std::string> body, Environment& env)
     : args_(std::move(args))
     , nArgs_(args_.size())
     , body_(std::move(body))
     , env_(env)
 {
+    //DEBUG
+    std::cout << "Creating closure with args: ";
+    {
+        std::stringstream ss;
+        for (const auto& it: args_) ss << it << ", ";
+        std::cout << ss.str();
+    }
+    std::cout << "\nBody: ";
+    {
+        std::stringstream ss;
+        for (const auto& it: body_) ss << it << " ";
+        std::cout << ss.str();
+    }
+    std::cout << std::endl;
+    //GUBED
 }
 
 ObjectPtr Closure::evaluate(Arguments& args, Environment& env)
@@ -33,7 +48,7 @@ ObjectPtr Closure::evaluate(Arguments& args, Environment& env)
         env.emplace(std::move(*param), std::move(*arg));
     }
     env.setParent(&env_);
-    return evaluateList(body_, env);
+    return ::evaluate(body_, env);
 }
 
 std::string Closure::typeToString() const
