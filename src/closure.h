@@ -8,7 +8,7 @@
 class Closure : public Procedure
 {
 public:
-    Closure(const char* name, Arguments args, std::list<ObjectPtr> body, Environment& env);
+    Closure(Arguments args, std::list<ObjectPtr> body, Environment& env);
 
     virtual ObjectPtr evaluate(Arguments& args, Environment& env) override;
 
@@ -17,8 +17,6 @@ public:
     virtual std::string toString() const override;
 
 private:
-    std::string name_;
-
     Arguments args_; // symbols for names of arguments
 
     std::size_t nArgs_;

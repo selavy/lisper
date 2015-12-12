@@ -22,12 +22,14 @@
 #include "environment.h"
 #include "eval.h"
 #include "init.h"
+#include "closure.h"
 
 typedef std::unordered_map<std::string, ObjectPtr> Primitives;
 
 std::list<ObjectPtr> readTail(std::list<Token>& tokens, Environment& env);
 ObjectPtr createList(ObjectPtr curr, std::list<ObjectPtr>& objs);
 ObjectPtr evaluate(std::list<Token>& tokens, Environment& env);
+std::list<ObjectPtr> unwrapPairs(ObjectPtr pair);
 
 //\! Converts container of iterables to std::list.
 template <class CONT>
@@ -121,6 +123,13 @@ ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
             throw std::runtime_error("Invalid token: " + token);
         }
     }
+//    else if (token == "lambda") {
+//        std::list<ObjectPtr> body = std::move(readTail(tokens, env));
+//        ObjectPtr first = body.front();
+//        std::list<ObjectPtr> args = std::move(unwrapPairs(first));
+//        POP(body);
+//        return ObjectPtr(new Closure(std::move(args), std::move(body), env));
+//    }
     else if (token == "(") {
         Token front = tokens.front();
         if (front == "quote") { // REVISIT(plesslie): not working correctly, CURRENTLY: (quote (1 2 3)) => '(2 3), should be '(1 2 3)
@@ -131,6 +140,17 @@ ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
             POP(tokens);
             std::list<ObjectPtr> lst = std::move(readTail(tokens, env));
             return lst.back();
+        }
+        else if (front == "define") {
+            POP(tokens);
+            Token symbol = tokens.front();
+            POP(tokens);
+            std::list<ObjectPtr> lst = std::move(readTail(tokens, env));
+            if (lst.size() != 1) {
+                throw std::runtime_error("Expected 2 arguments, given " + std::to_string(lst.size() + 1));
+            }
+            env.emplace(std::move(symbol), std::move(FIRST(lst)));
+            return ObjectPtr(new Empty);
         }
         else if (front == "if") {
             POP(tokens);
@@ -147,7 +167,11 @@ ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
             }
         }
         else if (front == "lambda") {
-            throw std::runtime_error("Unimplemented!");
+            std::list<ObjectPtr> body = std::move(readTail(tokens, env));
+            ObjectPtr first = body.front();
+            std::list<ObjectPtr> args = std::move(unwrapPairs(first));
+            POP(body);
+            return ObjectPtr(new Closure(std::move(args), std::move(body), env));
         }
         else { // function call
             std::list<ObjectPtr> lst = std::move(readTail(tokens, env));
@@ -178,6 +202,23 @@ std::list<ObjectPtr> readTail(std::list<Token>& tokens, Environment& env)
     } 
     POP(tokens); // remove final ')'
     return objs;
+}
+
+std::list<ObjectPtr> unwrapPairs(ObjectPtr pair)
+{
+    std::list<ObjectPtr> ret;
+    if (Pair* head = dynamic_cast<Pair*>(pair.get())) {
+        if (CAR(head) == nullptr) return ret;
+
+        ret.push_back(CAR(head));
+        while ((head = dynamic_cast<Pair*>(CDR(head).get()))) {
+            ret.push_back(CAR(head));        
+        }
+        return ret;
+    }
+    else {
+        throw std::runtime_error("Object is not a pair!");
+    }
 }
 
 //\! Take a string read in and evaluate it.
@@ -235,7 +276,11 @@ int main(int argc, char** argv)
         "(if #t (if #f 1 2) (if #f 3 4))",      // => 2
         "(quote (1 2 3))",                      // => '(1 2 3)
         "(begin (+ 1 2) (+ 3 4))",              // => 7
+        "(define a 23)",                        // => '()
+        "(begin (define a 23) (+ a 1))",        // => 24
+        "(begin (define add1 (lambda (x) (+ x 1))) (add1 23))" // => 24
         "(if (string? 123) 1 2)"                // => 2
+
     };
 
     for (const auto& c : cases)

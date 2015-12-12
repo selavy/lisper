@@ -2,9 +2,8 @@
 #include <sstream>
 #include "eval.h"
 
-Closure::Closure(const char* name, Arguments args, std::list<ObjectPtr> body, Environment& env)
-    : name_(name)
-    , args_(std::move(args))
+Closure::Closure(Arguments args, std::list<ObjectPtr> body, Environment& env)
+    : args_(std::move(args))
     , nArgs_(args_.size())
     , body_(std::move(body))
     , env_(env)
@@ -35,5 +34,5 @@ std::string Closure::typeToString() const
 
 std::string Closure::toString() const
 {
-    return name_;
+    return "Closure";
 }
