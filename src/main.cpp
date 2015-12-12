@@ -124,16 +124,51 @@ ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
     }
     else if (token == "(") {
         Token front = tokens.front();
-        std::list<ObjectPtr> lst;
-        while (front != ")") {
-            PUSH(lst, std::move(evaluate(tokens, env)));
-            front = tokens.front();
-        }
-        POP(tokens); // remove final ')' character
 
-        Environment scope;
-        scope.setParent(&env);
-        return evaluateList(lst, scope);
+        if (front == "begin") {
+            throw std::runtime_error("Unimplemented!");
+        }
+        else if (front == "if") {
+            std::list<ObjectPtr> lst;
+            POP(tokens);
+            front = tokens.front();
+            while (front != ")") {
+                PUSH(lst, std::move(evaluate(tokens, env)));
+                front = tokens.front();
+            }
+            POP(tokens); // remove final ')' character
+
+            if (lst.size() != 3) {
+                throw std::runtime_error("if statement expects 3 arguments, given " + std::to_string(lst.size()));
+            }
+            auto first = std::begin(lst);
+            if (toBoolean(*first)->value()) {
+                ++first;
+                return *first;
+            }
+            else {
+                ++first; ++first;
+                return *first;
+            }
+        }
+        else if (front == "quote") {
+            throw std::runtime_error("Unimplemented!");
+        }
+        else if (front == "lambda") {
+            throw std::runtime_error("Unimplemented!");
+        }
+        else { // function call
+            std::list<ObjectPtr> lst;
+            while (front != ")") {
+                PUSH(lst, std::move(evaluate(tokens, env)));
+                front = tokens.front();
+            }
+            POP(tokens); // remove final ')' character
+
+            Environment scope;
+            scope.setParent(&env);
+            return evaluateList(lst, scope);
+        }
     }
     else if (token[0] == ')') {
         throw std::runtime_error("Unmatched closing paren!");
@@ -168,25 +203,25 @@ void initializeEnvironment(Environment& env)
     //TODO(plesslie): remove these from symbol map and add case to evaluate()
     //
     
-    addPrimitive(env, "if",
-            [](Arguments& args, Environment& env)
-            {
-                if (args.size() != 3) {
-                    throw std::runtime_error("Expected 2 arguments, received: " + std::to_string(args.size()));
-                }
-
-                auto arg = std::begin(args);
-                // toBoolean() always succeeds
-                if (toBoolean(*arg)->value()) {
-                    ++arg;
-                    return *arg;
-                }
-                else {
-                    ++arg;
-                    ++arg;
-                    return *arg;
-                }
-            }); 
+//    addPrimitive(env, "if",
+//            [](Arguments& args, Environment& env)
+//            {
+//                if (args.size() != 3) {
+//                    throw std::runtime_error("Expected 2 arguments, received: " + std::to_string(args.size()));
+//                }
+//
+//                auto arg = std::begin(args);
+//                // toBoolean() always succeeds
+//                if (toBoolean(*arg)->value()) {
+//                    ++arg;
+//                    return *arg;
+//                }
+//                else {
+//                    ++arg;
+//                    ++arg;
+//                    return *arg;
+//                }
+//            }); 
     
     addPrimitive(env, "+",
             [](Arguments& args, Environment& env)
