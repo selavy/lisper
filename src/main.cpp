@@ -125,7 +125,11 @@ ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
     else if (token == "(") {
         Token front = tokens.front();
 
-        if (front == "begin") {
+        if (front == "quote") {
+            tokens.front() = "'";
+            return evaluate(tokens, env);
+        }
+        else if (front == "begin") {
             throw std::runtime_error("Unimplemented!");
         }
         else if (front == "if") {
@@ -150,9 +154,6 @@ ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
                 ++first; ++first;
                 return *first;
             }
-        }
-        else if (front == "quote") {
-            throw std::runtime_error("Unimplemented!");
         }
         else if (front == "lambda") {
             throw std::runtime_error("Unimplemented!");
@@ -473,7 +474,8 @@ int main(int argc, char** argv)
         "(if #t (+ 1 3) (+ 1 5))",
         "(if #f (+ 1 3) (+ 1 5))",
         "(if 1 1 2)",
-        "(if #t (if #f 1 2) (if #f 3 4))"
+        "(if #t (if #f 1 2) (if #f 3 4))",
+        "(quote (1 2 3))"
     };
 
     for (const auto& c : cases)
