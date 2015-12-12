@@ -42,13 +42,14 @@ std::list<typename CONT::value_type> toList(const CONT& container)
 //\! Converts a std::list<> to a linked list of pairs (recursive)
 ObjectPtr createList(ObjectPtr curr, std::list<ObjectPtr>& objs)
 {
-    //TODO(plesslie): this is tail recursive, change to a while loop
-    if (objs.empty()) return curr;
-    ObjectPtr front = objs.front();
-    POP(objs);
-    return createList(std::move(ObjectPtr(new Pair(front, curr))), objs);
+    ObjectPtr head = curr;
+    while (!objs.empty()) {
+        ObjectPtr front = objs.front();
+        POP(objs);
+        head = ObjectPtr(new Pair(front, head));
+    }
+    return head;
 }
-
 
 //\! evaluate a list of tokens into an object.
 ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
@@ -87,13 +88,11 @@ ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
         token = tokens.front();
         POP(tokens);
         if (token == "(") { // quoted list
-            token = tokens.front();
-            POP(tokens);
-            if (token == ")") {
+            std::list<ObjectPtr> objs = std::move(readTail(tokens, env));
+            if (objs.empty()) {
                 return ObjectPtr(new Empty);
             }
             else {
-                std::list<ObjectPtr> objs = std::move(readTail(tokens, env));
                 return createList(ObjectPtr(new Empty), objs);
             }
         }
