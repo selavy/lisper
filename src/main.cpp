@@ -170,9 +170,12 @@ ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
             POP(tokens);
             front = tokens.front();
             if (front == "(") {
+                POP(tokens);
                 front = tokens.front();
                 while (front != ")") {
+                    std::cout << "Pushing back " << front << std::endl;
                     arguments.push_back(front);
+                    env.emplace(std::move(front), std::move(ObjectPtr(new Symbol(front.c_str()))));
                     POP(tokens);
                     front = tokens.front();
                 }
@@ -186,10 +189,8 @@ ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
                 }
             }
 
+            //TODO(plesslie): don't evaluate body
             std::list<ObjectPtr> body = std::move(readTail(tokens, env));
-            //ObjectPtr first = body.front();
-            //std::list<ObjectPtr> args = std::move(unwrapPairs(first));
-            //POP(body);
             return ObjectPtr(new Closure(std::move(arguments), std::move(body), env));
         }
         else { // function call
@@ -297,7 +298,7 @@ int main(int argc, char** argv)
         "(begin (+ 1 2) (+ 3 4))",              // => 7
         "(define a 23)",                        // => '()
         "(begin (define a 23) (+ a 1))",        // => 24
-        "(begin (define add1 (lambda (x) (+ x 1))) (add1 23))" // => 24
+        "(begin (define add1 (lambda (x) (+ x 1))) (add1 23))", // => 24
         "(if (string? 123) 1 2)"                // => 2
 
     };

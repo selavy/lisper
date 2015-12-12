@@ -1,6 +1,9 @@
 #include "closure.h"
 #include <sstream>
 #include "eval.h"
+//DEBUG
+#include <iostream>
+//GUBED
 
 Closure::Closure(std::list<std::string> args, std::list<ObjectPtr> body, Environment& env)
     : args_(std::move(args))
@@ -18,9 +21,15 @@ ObjectPtr Closure::evaluate(Arguments& args, Environment& env)
         throw std::runtime_error(ss.str());
     }
 
+    //DEBUG
+    std::cout << "Evaluating closure!" << std::endl;
+    //GUBED
     auto param = std::begin(args_);
     auto arg = std::begin(args);
     for (; arg != std::end(args); ++arg, ++param) {
+        //DEBUG
+        std::cout << "inserting " << *param << " -> " << (*arg)->toString() << std::endl;
+        //GUBED
         env.emplace(std::move(*param), std::move(*arg));
     }
     env.setParent(&env_);
