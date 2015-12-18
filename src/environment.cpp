@@ -16,9 +16,9 @@ Environment::const_iterator Environment::find(const std::string& key) const
     return env_.find(key);
 }
 
-void Environment::emplace(std::string&& key, ObjectPtr&& obj)
+std::pair<Environment::iterator, bool> Environment::emplace(std::string&& key, ObjectPtr&& obj)
 {
-    env_.emplace(std::forward<std::string>(key), std::forward<ObjectPtr>(obj));
+    return env_.emplace(std::forward<std::string>(key), std::forward<ObjectPtr>(obj));
 }
 
 Environment::iterator Environment::begin()

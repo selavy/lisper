@@ -20,7 +20,7 @@ public:
 
     const_iterator find(const std::string& key) const;
 
-    void emplace(std::string&& key, ObjectPtr&& obj);
+    std::pair<iterator, bool> emplace(std::string&& key, ObjectPtr&& obj);
 
     iterator begin();
 

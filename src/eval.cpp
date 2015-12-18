@@ -147,7 +147,14 @@ ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
             if (lst.size() != 1) {
                 throw std::runtime_error("Expected 2 arguments, given " + std::to_string(lst.size() + 1));
             }
-            env.emplace(std::move(symbol), std::move(FIRST(lst)));
+            ObjectPtr& obj = FIRST(lst);
+            if (obj->isProcedure()) {
+                if (Closure* closure = dynamic_cast<Closure*>(obj.get())) {
+                    closure->setName(symbol.c_str());
+                }
+            }
+            env.emplace(std::move(symbol), std::move(obj));
+
             return ObjectPtr(new Empty);
         }
         else if (front == "if") {
@@ -172,7 +179,9 @@ ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
                 POP(tokens);
                 front = tokens.front();
                 while (front != ")") {
-                    std::cout << "Pushing back " << front << std::endl;
+                    //DEBUG
+                    //std::cout << "Pushing back " << front << std::endl;
+                    //GUBED
                     arguments.push_back(front);
                     env.emplace(std::move(front), std::move(ObjectPtr(new Symbol(front.c_str()))));
                     POP(tokens);
@@ -190,13 +199,16 @@ ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
 
             std::stringstream ss;
             for (const auto& it: arguments) ss << it << ", ";
-            std::cout << "EVAL::arguments: " << ss.str() << "\n";
-
+            //DEBUG
+            //std::cout << "EVAL::arguments: " << ss.str() << "\n";
+            //GUBED
             int cnt = 0;
             front = tokens.front();
             std::list<Token> body;
             while (!tokens.empty()){
-                std::cout << "BODY PUSHING BACK: " << front << std::endl;
+                //DEBUG
+                //std::cout << "BODY PUSHING BACK: " << front << std::endl;
+                //GUBED
                 body.push_back(front);
                 if (front == ")") {
                     --cnt;
@@ -210,8 +222,6 @@ ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
                 front = tokens.front();
             }
 
-            //TODO(plesslie): don't evaluate body
-            //std::list<ObjectPtr> body = std::move(readTail(tokens, env));
             POP(tokens);
             return ObjectPtr(new Closure(std::move(arguments), std::move(body), env));
         }
@@ -226,10 +236,16 @@ ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
         throw std::runtime_error("Unmatched closing paren!");
     }
     else {
+        //DEBUG
+        //std::cout << "Looking up symbol: '" << token << "'\n";
+        //GUBED
         auto found = env.find(token);
         if (found == std::end(env)) {
             throw std::runtime_error("Invalid symbol: '" + token + "'");
         }
+        //DEBUG
+        //std::cout << "...Found! " << found->second->toString() << "\n";
+        //GUBED
         return found->second;
     }    
 }

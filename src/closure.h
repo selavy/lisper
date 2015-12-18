@@ -17,7 +17,11 @@ public:
 
     virtual std::string toString() const override;
 
+    void setName(const char* name);
+
 private:
+    std::string name_;
+
     std::list<std::string> args_; // symbols for names of arguments
 
     std::size_t nArgs_;
