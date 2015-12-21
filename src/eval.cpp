@@ -233,6 +233,9 @@ ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
         }
     }
     else if (token[0] == ')') {
+        for (const auto& tkn: tokens) {
+            std::cout << tkn << "\n";
+        }
         throw std::runtime_error("Unmatched closing paren!");
     }
     else {

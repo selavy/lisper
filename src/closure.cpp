@@ -13,19 +13,19 @@ Closure::Closure(std::list<std::string> args, std::list<std::string> body, Envir
     , env_(env)
 {
     //DEBUG
-    //std::cout << "Creating closure with args: ";
-    //{
-    //    std::stringstream ss;
-    //    for (const auto& it: args_) ss << it << ", ";
-    //    std::cout << ss.str();
-    //}
-    //std::cout << "\nBody: ";
-    //{
-    //    std::stringstream ss;
-    //    for (const auto& it: body_) ss << it << " ";
-    //    std::cout << ss.str();
-    //}
-    //std::cout << std::endl;
+    std::cout << "Creating closure with args: ";
+    {
+        std::stringstream ss;
+        for (const auto& it: args_) ss << it << ", ";
+        std::cout << ss.str();
+    }
+    std::cout << "\nBody: ";
+    {
+        std::stringstream ss;
+        for (const auto& it: body_) ss << it << " ";
+        std::cout << ss.str();
+    }
+    std::cout << std::endl;
     //GUBED
 }
 
@@ -38,19 +38,19 @@ ObjectPtr Closure::evaluate(Arguments& args, Environment& env)
     }
 
     //DEBUG
-    //std::cout << "Evaluating closure!" << std::endl;
+    std::cout << "Evaluating closure!" << std::endl;
     //GUBED
     auto param = std::begin(args_);
     auto arg = std::begin(args);
     for (; arg != std::end(args); ++arg, ++param) {
         //DEBUG
-        //std::cout << "inserting " << *param << " -> " << (*arg)->toString() << std::endl;
+        std::cout << "inserting " << *param << " -> " << (*arg)->toString() << std::endl;
         //GUBED
 
         auto found = env.find(*param);
         if (found != std::end(env)) {
             //DEBUG
-            //std::cout << "Successfully inserted symbol!\n";
+            std::cout << "Successfully inserted symbol!\n";
             //GUBED
             found->second = std::move(*arg);
         }

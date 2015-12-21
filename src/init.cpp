@@ -230,4 +230,28 @@ void initializeEnvironment(Environment& env)
                 //TEMP(plesslie): should return Empty
                 return vec;
             });
+
+    addPrimitive(env, "eq?",
+            [](Arguments& args, Environment& env)
+            {
+                if (args.empty() || args.size() != 2) {
+                    throw std::runtime_error("Expected 2 arguments, given " + std::to_string(args.size()) + " arguments.");
+                }
+                ObjectPtr first = args.front();
+                POP(args);
+                ObjectPtr second = args.front();
+                POP(args);
+                
+                //TODO(plesslie): finish implementing for other types
+                if (first->isNumber() && second->isNumber()) {
+                    ObjectPtr res(new Boolean(toInteger(first)->value() == toInteger(second)->value()));
+                    //DEBUG
+                    std::cout << "checking (eq? " << toInteger(first)->value() << " " << toInteger(second)->value() << ") => " << res->toString() << "\n";
+                    //GUBED
+                    return res;
+                }
+                else {
+                    return ObjectPtr(new Boolean(false));
+                }
+            });
 }
