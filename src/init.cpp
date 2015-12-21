@@ -246,7 +246,7 @@ void initializeEnvironment(Environment& env)
                 if (first->isNumber() && second->isNumber()) {
                     ObjectPtr res(new Boolean(toInteger(first)->value() == toInteger(second)->value()));
                     //DEBUG
-                    std::cout << "checking (eq? " << toInteger(first)->value() << " " << toInteger(second)->value() << ") => " << res->toString() << "\n";
+                    //std::cout << "checking (eq? " << toInteger(first)->value() << " " << toInteger(second)->value() << ") => " << res->toString() << "\n";
                     //GUBED
                     return res;
                 }

@@ -3,6 +3,7 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <ios>
 #include "environment.h"
 #include "procedure.h"
 #include "closure.h"
@@ -58,9 +59,43 @@ ObjectPtr createList(ObjectPtr curr, std::list<ObjectPtr>& objs)
     return head;
 }
 
+std::list<Token> lazyEval(std::list<Token>& tokens)
+{
+    std::list<Token> ret;
+    if (tokens.empty()) {
+        return ret;
+    }
+
+    Token token = tokens.front();
+    PUSH(ret, token);
+    POP(tokens);
+
+    if (token == "(") {
+        int parens = 1;
+        while (parens) {
+            if (tokens.empty()) {
+                throw std::runtime_error("Unmatched parens!");
+            }
+            token = tokens.front();
+            POP(tokens);
+            if (token == ")") --parens;
+            else if (token == "(") ++parens;
+            PUSH(ret, token);
+        }
+    }
+
+    return ret;
+}
+
 //\! evaluate a list of tokens into an object.
 ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
 {
+    //DEBUG
+    //std::cout << "Entering evaluate: ";
+    //for (const auto& tok: tokens) std::cout << tok << " ";
+    //std::cout << std::endl;
+    //GUBED
+
     // [LET (TOKEN = first token in tokens, C = first character of token)]
     //------------------------------------------------------------------------
     // [Case]             | [Result]
@@ -79,17 +114,23 @@ ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
     // C ~ (              | List()
     
     if (tokens.empty()) {
+        //DEBUG
+        //std::cout << "Returning Empty";
+        //GUBED
         return ObjectPtr(new Empty);
     }
 
     Token token = tokens.front();
     POP(tokens);
+    ObjectPtr ret;
 
     if (std::isdigit(token[0])) {
-        return ObjectPtr(new Integer(token.c_str()));
+        //return ObjectPtr(new Integer(token.c_str()));
+        ret.reset(new Integer(token.c_str()));
     }
     else if (token[0] == '"') {
-        return ObjectPtr(new String(token.c_str()));
+        //return ObjectPtr(new String(token.c_str()));
+         ret.reset(new String(token.c_str()));
     }
     else if (token == "'") {
         token = tokens.front();
@@ -97,10 +138,12 @@ ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
         if (token == "(") { // quoted list
             std::list<ObjectPtr> objs = std::move(readTail(tokens, env));
             if (objs.empty()) {
-                return ObjectPtr(new Empty);
+                //return ObjectPtr(new Empty);
+                ret.reset(new Empty);
             }
             else {
-                return createList(ObjectPtr(new Empty), objs);
+                //return createList(ObjectPtr(new Empty), objs);
+                ret = std::move(createList(ObjectPtr(new Empty), objs));
             }
         }
         else {
@@ -108,7 +151,8 @@ ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
         }
     }
     else if (Boolean::isBoolean(token.c_str())) {
-        return ObjectPtr(new Boolean(token.c_str()));
+        //return ObjectPtr(new Boolean(token.c_str()));
+        ret.reset(new Boolean(token.c_str()));
     }
     else if (token == "#" || token == "'#") {
         token = tokens.front();
@@ -121,7 +165,8 @@ ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
                 front = tokens.front();
             }
             POP(tokens); // remove final ')' character
-            return vec;
+            //return vec;
+            ret = std::move(vec);
         }
         else {
             //TODO(plesslie): handle characters
@@ -132,12 +177,14 @@ ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
         Token front = tokens.front();
         if (front == "quote") { // REVISIT(plesslie): not working correctly, CURRENTLY: (quote (1 2 3)) => '(2 3), should be '(1 2 3)
             tokens.front() = "'";
-            return evaluate(tokens, env);
+            //return evaluate(tokens, env);
+            ret = std::move(evaluate(tokens, env));
         }
         else if (front == "begin") {
             POP(tokens);
             std::list<ObjectPtr> lst = std::move(readTail(tokens, env));
-            return lst.back();
+            //return lst.back();
+            ret = std::move(lst.back());
         }
         else if (front == "define") {
             POP(tokens);
@@ -150,26 +197,49 @@ ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
             ObjectPtr& obj = FIRST(lst);
             if (obj->isProcedure()) {
                 if (Closure* closure = dynamic_cast<Closure*>(obj.get())) {
+                    //std::cout << "setting name of closure: " << symbol.c_str() << std::endl;
                     closure->setName(symbol.c_str());
                 }
             }
+            //DEBUG
+            //if (symbol == "factorial") {
+            //    std::cout << "INSERTING FACTORIAL INTO ENV: ";
+            //    dynamic_cast<Closure*>(obj.get())->printBody();
+            //}
+            //GUBED
             env.emplace(std::move(symbol), std::move(obj));
 
-            return ObjectPtr(new Empty);
+            //return ObjectPtr(new Empty);
+            ret.reset(new Empty);
         }
         else if (front == "if") {
             POP(tokens);
-            std::list<ObjectPtr> lst = std::move(readTail(tokens, env));
-            if (lst.size() != 3) {
-                throw std::runtime_error("if statement expects 3 arguments, given " + std::to_string(lst.size()));
+            std::list<Token> cond = lazyEval(tokens);
+            //std::cout << "IF STATEMENT CONDITION: ";
+            //for (const auto& it: cond) {
+            //    std::cout << it << " ";
+            //}
+            //std::cout << std::endl;
+
+            ObjectPtr condObj = ::evaluate(cond, env);
+            if (!condObj->isBoolean()) {
+                throw std::runtime_error("Expected boolean as first argument to 'if' statement");
             }
-            auto first = FIRST(lst);
-            if (toBoolean(first)->value()) {
-                return SECOND(lst);
-            }
-            else {
-                return THIRD(lst);
-            }
+
+            const bool res = toBoolean(condObj)->value();
+            //std::cout << "Condition value is: " << std::boolalpha << res << std::endl;
+
+            std::list<Token> first = lazyEval(tokens);
+            std::list<Token> second = lazyEval(tokens);
+
+            //std::list<Token>& branch = res ? first : second;
+            //std::cout << "BRANCH BODY: ";
+            //for (const auto& it : branch) {
+            //    std::cout << it << " ";
+            //}
+            //std::cout << std::endl;
+            //std::cout << "begin evaluating branch body\n";
+            ret = std::move(evaluate(res ? first : second, env));
         }
         else if (front == "lambda") {
             std::list<std::string> arguments;
@@ -179,9 +249,6 @@ ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
                 POP(tokens);
                 front = tokens.front();
                 while (front != ")") {
-                    //DEBUG
-                    //std::cout << "Pushing back " << front << std::endl;
-                    //GUBED
                     arguments.push_back(front);
                     env.emplace(std::move(front), std::move(ObjectPtr(new Symbol(front.c_str()))));
                     POP(tokens);
@@ -199,16 +266,10 @@ ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
 
             std::stringstream ss;
             for (const auto& it: arguments) ss << it << ", ";
-            //DEBUG
-            //std::cout << "EVAL::arguments: " << ss.str() << "\n";
-            //GUBED
             int cnt = 0;
             front = tokens.front();
             std::list<Token> body;
             while (!tokens.empty()){
-                //DEBUG
-                //std::cout << "BODY PUSHING BACK: " << front << std::endl;
-                //GUBED
                 body.push_back(front);
                 if (front == ")") {
                     --cnt;
@@ -216,20 +277,20 @@ ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
                 else if (front == "(") {
                     ++cnt;
                 }
-
                 POP(tokens);
                 if (cnt == 0) break;
                 front = tokens.front();
             }
-
             POP(tokens);
-            return ObjectPtr(new Closure(std::move(arguments), std::move(body), env));
+            //return ObjectPtr(new Closure(std::move(arguments), std::move(body), env));
+            ret.reset(new Closure(std::move(arguments), std::move(body), env));
         }
         else { // function call
             std::list<ObjectPtr> lst = std::move(readTail(tokens, env));
             Environment scope;
             scope.setParent(&env);
-            return evaluateList(lst, scope);
+            //return evaluateList(lst, scope);
+            ret = std::move(evaluateList(lst, scope));
         }
     }
     else if (token[0] == ')') {
@@ -239,18 +300,23 @@ ObjectPtr evaluate(std::list<Token>& tokens, Environment& env)
         throw std::runtime_error("Unmatched closing paren!");
     }
     else {
-        //DEBUG
-        //std::cout << "Looking up symbol: '" << token << "'\n";
-        //GUBED
         auto found = env.find(token);
         if (found == std::end(env)) {
             throw std::runtime_error("Invalid symbol: '" + token + "'");
         }
-        //DEBUG
-        //std::cout << "...Found! " << found->second->toString() << "\n";
-        //GUBED
-        return found->second;
+        //return found->second;
+        ret = found->second;
     }    
+
+    //std::cout << "Evaluate returning: " << ret->toString() << "\n";
+    //if (ret->isProcedure()) {
+    //    Closure* closure = dynamic_cast<Closure*>(ret.get());
+    //    if (closure) {
+    //        std::cout << "Returning closure... ";
+    //        closure->printBody();
+    //    }
+    //}
+    return ret;
 }
 
 std::list<ObjectPtr> readTail(std::list<Token>& tokens, Environment& env)

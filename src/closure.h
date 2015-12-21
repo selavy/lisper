@@ -19,6 +19,8 @@ public:
 
     void setName(const char* name);
 
+    void printBody() const;
+
 private:
     std::string name_;
 
@@ -26,7 +28,7 @@ private:
 
     std::size_t nArgs_;
 
-    std::list<std::string> body_;
+    const std::list<std::string> body_;
 
     Environment& env_;
 };
