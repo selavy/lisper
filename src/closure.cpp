@@ -11,6 +11,7 @@ Closure::Closure(std::list<std::string> args, std::list<std::string> body, Envir
     , nArgs_(args_.size())
     , body_(std::move(body))
     , env_(env)
+    , spacing_(0)
 {
     //DEBUG
     //std::cout << "CREATING CLOSURE: ";
@@ -27,40 +28,19 @@ ObjectPtr Closure::evaluate(Arguments& args, Environment& env)
         throw std::runtime_error(ss.str());
     }
 
-    //DEBUG
-    //std::cout << "EVALUATING CLOSURE!" << std::endl;
-    //GUBED
+    Environment scope;
     auto param = std::begin(args_);
     auto arg = std::begin(args);
-    //DEBUG
-    //std::cout << "Arguments: ( ";
-    //GUBED
     for (; arg != std::end(args); ++arg, ++param) {
-        //DEBUG
-        //std::cout << (*arg)->toString() << " ";
-        //GUBED
-
-        auto found = env.find(*param);
-        if (found != std::end(env)) {
-            found->second = std::move(*arg);
-        }
-        else {
-            throw std::runtime_error("Failed to insert symbol!");
-        }
+        std::string paramCopy = *param;
+        scope.emplace(std::move(paramCopy), std::move(*arg));
     }
-    //DEBUG
-    //std::cout << ")\n";
-    //GUBED
     env.setParent(&env_);
+    scope.setParent(&env);
 
-    //DEBUG
-    //std::cout << "CLOSURE BODY: ";
-    //for (const auto& tok: body_) std::cout << tok << " ";
-    //std::cout << std::endl;
-    //GUBED
-
-    std::list<std::string> body(body_);
-    return ::evaluate(body, env);
+    std::list<std::string> body(body_); // make a copy so it won't be modified by ::evaluate()
+    ObjectPtr ret = std::move(::evaluate(body, scope));
+    return ret;
 }
 
 std::string Closure::typeToString() const
@@ -80,10 +60,12 @@ void Closure::setName(const char* name)
 
 void Closure::printBody() const
 {
+#if 0
     std::cout << "CLOSURE BODY: ";
     for (const auto& it : body_) {
         std::cout << it << " ";
     }
     std::cout << std::endl;
+#endif
 }
 

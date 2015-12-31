@@ -34,10 +34,34 @@ public:
 
     Environment* getParent();
 
+    void print() const;
+
+    void clearP();
+
+    int getName() const;
+
 private:
      SymbolTable env_;
 
      Environment* parent_;
+
+     mutable bool p_;
+
+     int name_;
+};
+
+struct NameGenerator
+{
+    static NameGenerator& instance();
+
+    int getName() const;
+
+private:
+    NameGenerator();
+
+    ~NameGenerator();
+
+    mutable int curr_; 
 };
 
 #endif // ENVIRONMENT__H_

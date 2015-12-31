@@ -107,7 +107,31 @@ int main(int argc, char** argv)
         "(begin (define fact (lambda (x) (if (eq? x 0) 1 (* x (- x 1))))) (fact 4))", // => 1
         "(begin (define factorial (lambda (x) (if (eq? x 0) 1 (* x (factorial (- x 1)))))) (factorial 0))", // => 1
         "(begin (define factorial (lambda (x) (if (eq? x 0) 1 (* x (factorial (- x 1)))))) (factorial 1))", // => 1
-        "(begin (define factorial (lambda (x) (if (eq? x 0) 1 (* x (factorial (- x 1)))))) (factorial 4))" // => 24
+        "(begin (define factorial (lambda (x) (if (eq? x 0) 1 (* x (factorial (- x 1)))))) (factorial 4))", // => 24
+        "(begin                                     "
+        "   (define fib (lambda (n)                 "
+        "       (if (< n 2)                         "
+        "           n                               "
+        "           (+ (fib (- n 1)) (fib (- n 2))) "
+        "       )                                   "
+        "   ))                                      "
+        "(fib 2))                                   ", // => 1
+        "(begin                                     "
+        "   (define fib (lambda (n)                 "
+        "       (if (< n 2)                         "
+        "           n                               "
+        "           (+ (fib (- n 1)) (fib (- n 2))) "
+        "       )                                   "
+        "   ))                                      "
+        "(fib 4))                                   ", // => 3
+        "(begin                                     "
+        "   (define fib (lambda (n)                 "
+        "       (if (< n 2)                         "
+        "           n                               "
+        "           (+ (fib (- n 1)) (fib (- n 2))) "
+        "       )                                   "
+        "   ))                                      "
+        "(fib 8))                                   " // => 21 
     };
 
     for (const auto& c : cases)

@@ -66,6 +66,6 @@ Integer::value_type Integer::value() const
 Integer* toInteger(const ObjectPtr& p)
 {
     Integer* i = dynamic_cast<Integer*>(p.get());
-    if (!i) throw std::runtime_error("Object not integer: " + p->toString());
+    if (!i) throw std::runtime_error("Object not integer: " + p->typeToString() + "::" + p->toString());
     return i;
 }

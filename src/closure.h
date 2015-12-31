@@ -31,6 +31,8 @@ private:
     const std::list<std::string> body_;
 
     Environment& env_;
+
+    int spacing_;
 };
 
 #endif  // CLOSURE__H_
